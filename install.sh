@@ -45,22 +45,26 @@ sudo apt-get install gdebi-core -y
 
 message "Install RStudio"
 wget https://download2.rstudio.org/rstudio-server-1.1.383-amd64.deb
-sudo gdebi rstudio-server-1.1.383-amd64.deb
+yes | sudo gdebi rstudio-server-1.1.383-amd64.deb -y
+
+#message "Install Apache"
+#sudo apt-get --yes --force-yes install apache2
 
 message "Install MongoDB"
 wget http://launchpadlibrarian.net/293727143/libc6_2.23-0ubuntu5_amd64.deb
-sudo gdebi libc6_2.23-0ubuntu5_amd64.deb
+yes | sudo gdebi libc6_2.23-0ubuntu5_amd64.deb -y
 
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
-echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/testing multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
+sudo echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/testing multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
 sudo apt-get update -y
-sudo apt-get install -y mongodb-org -y
+sudo apt-get install -y mongodb-org
 
 sudo service mongod start
 cat /var/log/mongodb/mongod.log
 
 message "Install openssl"
-sudo apt-get install libssl-dev
+#sudo apt-get install libssl-dev libcurl4-openssl-dev libsasl2-dev
+sudo apt-get install -y libssl-dev libsasl2-dev libcurl4-openssl-dev
 
 #sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee -a /etc/apt/sources.list.d/webupd8team-java.list
 #sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/webupd8team-java.list
