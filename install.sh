@@ -81,6 +81,8 @@ sudo echo 'install.packages("rvest")' | sudo tee -a install_packages.R
 sudo echo 'require(rvest)' | sudo tee -a load_packages.R
 sudo echo 'install.packages("dplyr")' | sudo tee -a install_packages.R
 sudo echo 'require(dplyr)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("tibble")' | sudo tee -a install_packages.R
+sudo echo 'require(tibble)' | sudo tee -a load_packages.R
 
 #sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee -a /etc/apt/sources.list.d/webupd8team-java.list
 #sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/webupd8team-java.list
