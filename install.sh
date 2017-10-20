@@ -65,7 +65,7 @@ sudo service mongod start
 cat /var/log/mongodb/mongod.log
 
 message "Install openssl"
-sudo apt-get install -y libssl-dev libsasl2-dev libcurl4-openssl-dev libpq-dev
+sudo apt-get install -y libssl-dev libsasl2-dev libcurl4-openssl-dev libpq-dev libxml2-dev
 
 message "Install PostgreSQL"
 sudo apt-get update -y
@@ -73,6 +73,14 @@ sudo apt-get install -y postgresql postgresql-contrib
 sudo -u postgres createuser --interactive
 sudo -u postgres createdb ildar
 
+sudo echo 'install.packages("mongolite")' | sudo tee install_packages.R
+sudo echo 'require(mongolite)' | sudo tee load_packages.R
+sudo echo 'install.packages("lubridate")' | sudo tee -a install_packages.R
+sudo echo 'require(lubridate)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("rvest")' | sudo tee -a install_packages.R
+sudo echo 'require(rvest)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("dplyr")' | sudo tee -a install_packages.R
+sudo echo 'require(dplyr)' | sudo tee -a load_packages.R
 
 #sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee -a /etc/apt/sources.list.d/webupd8team-java.list
 #sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/webupd8team-java.list
