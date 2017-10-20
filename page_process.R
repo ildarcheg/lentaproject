@@ -1,6 +1,6 @@
 require(jsonlite)
-require(dplyr)
 source("dbmongo.R")
+source("page_tyding.R")
 
 args <- commandArgs()
 numberOfPagesToProcess <- as.integer(args[length(args)])
@@ -23,8 +23,14 @@ for (i in 1:numberOfPagesToProcess) {
 queryString <- paste0('{"process":"', process, '"}')
 pagesToProcess <- pagesCollection$find(queryString)
 
+pagesToProcessD <- pagesToProcess
+
+pagesToProcessD <- add_column(pagesToProcessD, urlKey = "", .before = "url") %>% mutate(urlKey = gsub(":|\\.|/", "", link))
 
 
+
+
+pagesToProcessD <- pagesToProcessD %>% mutate(urlKey = gsub(":|\\.|/", "", link))
 
 
 for (i in 1:nrow(pagesToProcess)) {
