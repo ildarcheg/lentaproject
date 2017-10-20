@@ -45,17 +45,19 @@ sudo apt-get install gdebi-core -y
 
 message "Install RStudio"
 wget https://download2.rstudio.org/rstudio-server-1.1.383-amd64.deb
-yes | sudo gdebi rstudio-server-1.1.383-amd64.deb -y
+yes | sudo gdebi rstudio-server-1.1.383-amd64.deb
+rm rstudio-server-1.1.383-amd64.deb
 
 #message "Install Apache"
 #sudo apt-get --yes --force-yes install apache2
 
 message "Install MongoDB"
 wget http://launchpadlibrarian.net/293727143/libc6_2.23-0ubuntu5_amd64.deb
-yes | sudo gdebi libc6_2.23-0ubuntu5_amd64.deb -y
+yes | sudo gdebi libc6_2.23-0ubuntu5_amd64.deb 
+rm libc6_2.23-0ubuntu5_amd64.deb 
 
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
-sudo echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/testing multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
+sudo sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6 
+sudo echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
 sudo apt-get update -y
 sudo apt-get install -y mongodb-org
 
@@ -63,8 +65,24 @@ sudo service mongod start
 cat /var/log/mongodb/mongod.log
 
 message "Install openssl"
-#sudo apt-get install libssl-dev libcurl4-openssl-dev libsasl2-dev
-sudo apt-get install -y libssl-dev libsasl2-dev libcurl4-openssl-dev
+sudo apt-get install -y libssl-dev libsasl2-dev libcurl4-openssl-dev libpq-dev libxml2-dev
+
+message "Install PostgreSQL"
+sudo apt-get update -y
+sudo apt-get install -y postgresql postgresql-contrib
+sudo -u postgres createuser --interactive
+sudo -u postgres createdb ildar
+
+sudo echo 'install.packages("mongolite")' | sudo tee install_packages.R
+sudo echo 'require(mongolite)' | sudo tee load_packages.R
+sudo echo 'install.packages("lubridate")' | sudo tee -a install_packages.R
+sudo echo 'require(lubridate)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("rvest")' | sudo tee -a install_packages.R
+sudo echo 'require(rvest)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("dplyr")' | sudo tee -a install_packages.R
+sudo echo 'require(dplyr)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("tibble")' | sudo tee -a install_packages.R
+sudo echo 'require(tibble)' | sudo tee -a load_packages.R
 
 #sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee -a /etc/apt/sources.list.d/webupd8team-java.list
 #sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/webupd8team-java.list
