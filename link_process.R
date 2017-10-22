@@ -28,8 +28,8 @@ for (i in 1:nrow(linksToProcess)) {
   link <- linksToProcess$link[i]
   archiveDay <- linksToProcess$day[i]
   
-  if (is.null(archivePageLink)) next
-  
+  if (is.null(link)) next
+
   if (nchar(link) < 20) {
     queryString <- paste0('{"link":"', link, '"}')  
     linksCollection$remove(queryString) 
@@ -43,7 +43,8 @@ for (i in 1:nrow(linksToProcess)) {
   updateString <- gsub("\\[|\\]", "", pageJSON)
 
   pagesCollection$update(queryString, update = updateString, upsert = TRUE)
-  linksCollection$remove(queryString) 
+  updateString <- paste0('{ "$set": {"status":2, "process":"", "updatedat":"', updatedat, '"} }')
+  linksCollection$update(queryString, update = updateString, upsert = TRUE)
 }
 
 

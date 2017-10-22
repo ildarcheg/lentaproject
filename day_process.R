@@ -42,7 +42,8 @@ for (i in 1:nrow(daysToProcess)) {
     linksCollection$update(queryString, update = updateString, upsert = TRUE)
   }
   queryString <- paste0('{"archivePageLink":"', archivePageLink, '"}')
-  daysCollection$remove(queryString) 
+  updateString <- paste0('{ "$set": {"status":2, "process":"", "updatedat":"', updatedat, '"} }')
+  daysCollection$update(queryString, update = updateString, upsert = TRUE)
 }
 
 

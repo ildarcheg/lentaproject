@@ -3,11 +3,11 @@ require(tibble)
 require(tidyr)
 require(data.table)
 require(tldextract)
+require(stringr)
+require(tm)
+require(lubridate)
 
-TityData <- function() {
-  
-  queryString <- paste0('{"process":"', process, '"}')
-  pagesToProcess <- pagesCollection$find(queryString)
+TityData <- function(pagesToProcess) {
 
   # SECTION 1
   # Create urlKey column as a key
@@ -122,8 +122,8 @@ TityData <- function() {
   # "http://www.dw.com/ru/../B2 https://www.welt.de/politik/.../de/"
   # should be represented as "dw.com welt.de"
   
-  # Function UpdateAdditionalLinks is used to process and clean additionalLinks 
-  # and plaintextLinks
+  # Function UpdateAdditionalLinks is used to process additionalLinks 
+  # and plaintextLinks and retrive source domain name
   UpdateAdditionalLinks <- function(additionalLinks, url) {
     if (is.na(additionalLinks)) {
       return(NA)
@@ -135,36 +135,9 @@ TityData <- function() {
     additionalLinksSplitted <- unlist(strsplit(additionalLinksSplitted, " "))
     additionalLinksSplitted <- additionalLinksSplitted[!additionalLinksSplitted==""]
     additionalLinksSplitted <- additionalLinksSplitted[!grepl("lenta.", additionalLinksSplitted)]
-    additionalLinksSplitted <- unlist(strsplit(additionalLinksSplitted, "/[^/]*$"))
-    additionalLinksSplitted <- paste0("http://", additionalLinksSplitted)
-    
-    if (!length(additionalLinksSplitted) == 0) {
-      URLSplitted <- c()
-      for(i in 1:length(additionalLinksSplitted)) {
-        parsed <- tryCatch(parseURI(additionalLinksSplitted[i]), error = function(x) {return(NA)}) 
-        parsedURL <- parsed["server"]
-        if (!is.na(parsedURL)) {
-          URLSplitted <- c(URLSplitted, parsedURL) 
-        }
-      }
-      if (length(URLSplitted)==0){
-        NA
-      } else {
-        URLSplitted <- URLSplitted[!is.na(URLSplitted)]
-        paste0(URLSplitted, collapse = " ")
-      }
-    } else {
-      NA
-    }
-  }
-  
-  # Function UpdateAdditionalLinksDomain is used to process additionalLinks 
-  # and plaintextLinks and retrive source domain name
-  UpdateAdditionalLinksDomain <- function(additionalLinks, url) {
-    if (is.na(additionalLinks)|(additionalLinks=="NA")) {
-      return(NA)
-    }
-    additionalLinksSplitted <- unlist(strsplit(additionalLinks, " "))
+    #additionalLinksSplitted <- unlist(strsplit(additionalLinksSplitted, "/[^/]*$"))
+    additionalLinksSplitted <- sub("/.*", "", additionalLinksSplitted)
+    #additionalLinksSplitted <- paste0("http://", additionalLinksSplitted)
     if (!length(additionalLinksSplitted) == 0) {
       parsedDomain <- tryCatch(tldextract(additionalLinksSplitted), error = function(x) {data_frame(domain = NA, tld = NA)}) 
       parsedDomain <- parsedDomain[!is.na(parsedDomain$domain), ]
@@ -179,38 +152,23 @@ TityData <- function() {
       return(domain)
     } else {
       return(NA)
-    }
+    }    
   }
-  
-  dtD <- dtD %>% 
-    mutate(plaintextLinks = mapply(UpdateAdditionalLinks, plaintextLinks, url)) %>%
-    mutate(additionalLinks = mapply(UpdateAdditionalLinks, additionalLinks, url))
   
   # Retrive domain from external links using updateAdditionalLinksDomain 
   # function. Links such as:
   # "http://www.dw.com/ru/../B2 https://www.welt.de/politik/.../de/"
   # should be represented as "dw.com welt.de" 
-  dtD$additionalLinks <- mapply(UpdateAdditionalLinksDomain, dtD$additionalLinks, dtD$url)
-  dtD$plaintextLinks <- mapply(UpdateAdditionalLinksDomain, dtD$plaintextLinks, dtD$url)
- 
-  numberOfLinks <- nrow(dtD)
-  groupSize <- 10000
-  groupsN <- seq(from = 1, to = numberOfLinks, by = groupSize)
-  
-  for (i in 1:length(groupsN)) {
-    n1 <- groupsN[i]
-    n2 <- min(n1 + groupSize - 1, numberOfLinks) 
-    dtD$additionalLinks[n1:n2] <- mapply(UpdateAdditionalLinksDomain, dtD$additionalLinks[n1:n2], dtD$url[n1:n2])
-    dtD$plaintextLinks[n1:n2] <- mapply(UpdateAdditionalLinksDomain, dtD$plaintextLinks[n1:n2], dtD$url[n1:n2])
-  }
+  dtD <- dtD %>% 
+    mutate(plaintextLinks = mapply(UpdateAdditionalLinks, plaintextLinks, url)) %>%
+    mutate(additionalLinks = mapply(UpdateAdditionalLinks, additionalLinks, url))
   
   # SECTION 8
-  print(paste0("8 ",Sys.time()))
   # Clean title, descriprion and plain text. Remove puntuation and stop words.
   # Prepare for the stem step
   stopWords <- readLines("stop_words.txt", warn = FALSE, encoding = "UTF-8")
   
-  dtD <- dtD %>% as.tbl() %>% mutate(stemTitle = tolower(title), 
+  dtD <- dtD %>% as.tbl() %>% mutate(stemTitle = tolower(metaTitle), 
                                      stemMetaDescription = tolower(metaDescription), 
                                      stemPlaintext = tolower(plaintext))
   dtD <- dtD %>% as.tbl() %>% mutate(stemTitle = enc2utf8(stemTitle), 
@@ -228,19 +186,6 @@ TityData <- function() {
   dtD <- dtD %>% as.tbl() %>% mutate(stemTitle = str_trim(stemTitle, side = "both"), 
                                      stemMetaDescription = str_trim(stemMetaDescription, side = "both"), 
                                      stemPlaintext = str_trim(stemPlaintext, side = "both"))
-  # SECTION 9
-  print(paste0("9 ",Sys.time()))
-  write.csv(dtD, file.path(tidyArticlesFolder, "tidy_articles_data.csv"), fileEncoding = "UTF-8")
-  
-  # SECTION 10 Finish
-  print(paste0("10 ",Sys.time()))
-  
-  # SECTION 11 Adding social
-  dfM <- read.csv(file.path(tidyArticlesFolder, "tidy_articles_data.csv"), stringsAsFactors = FALSE, encoding = "UTF-8")
-  dfS <- read.csv(file.path(parsedArticlesFolder, "social_articles.csv"), stringsAsFactors = FALSE, encoding = "UTF-8")
-  dt <- as.tbl(dfM)
-  dtS <- as.tbl(dfS) %>% rename(url = link) %>% select(url, FB, VK, OK, Com)
-  dtG <- left_join(dt, dtS, by = "url")
-  
+  return(dtD)  
 }
 

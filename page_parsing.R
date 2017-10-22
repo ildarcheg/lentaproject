@@ -46,11 +46,13 @@ ReadLink <- function(link, archiveDay) {
     plaintext <- NA
   }
   
+  
   # Extract links from articles body 
   plaintextLinks <- html_nodes(articleBodyNode, xpath=".//a") %>% 
     html_attr("href") %>% 
     unique() %>% 
-    paste0(collapse=" ")
+    paste0(collapse=" ") %>%
+    SetNAIfZeroLength()
   if (plaintextLinks == "") {
     plaintextLinks <- NA
   }
@@ -59,7 +61,8 @@ ReadLink <- function(link, archiveDay) {
   additionalLinks <- html_nodes(pg, xpath=".//section/div[@class='item']/div/..//a") %>% 
     html_attr("href") %>% 
     unique() %>% 
-    paste0(collapse=" ")
+    paste0(collapse=" ") %>%
+    SetNAIfZeroLength()
   if (additionalLinks == "") {
     additionalLinks <- NA
   }

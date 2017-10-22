@@ -8,21 +8,27 @@ commandArgs <- function() c(100)
 source('day_process.R')
 commandArgs <- function() c(100)
 source('link_process.R')
-
+commandArgs <- function() c(100)
+source('page_process.R')
 
 daysCollection <- GetCollection("daytobeprocessed")
 linksCollection <- GetCollection("linkstobeprocessed")
 pageCollection <- GetCollection("pagestobeprocessed")
+articlesCollection <- GetCollection("articlestobeprocessed")
 
 daysCollection$find()
 linksCollection$find()
 pageCollection$find()
+articlesCollection$find()
 
+updatedat <- format(Sys.time(), "%a %b %d %X %Y %Z")
+updateString <- paste0('{ "$set": {"status":0, "process":"", "updatedat":"', updatedat, '"} }')
+pagesCollection$update('{}', update = updateString, upsert = FALSE, multiple = TRUE)  
 
 daysCollection$drop()
 linksCollection$drop()
 pageCollection$drop()
-
+articlesCollection$drop()
 
 
 dayscollection <- mongo(collection = "dayscollection",  db = "lenta", url = "mongodb://localhost")

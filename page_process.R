@@ -23,29 +23,19 @@ for (i in 1:numberOfPagesToProcess) {
 queryString <- paste0('{"process":"', process, '"}')
 pagesToProcess <- pagesCollection$find(queryString)
 
-pagesToProcessD <- pagesToProcess
+pagesToProcessD <- TityData(pagesToProcess)
 
-pagesToProcessD <- add_column(pagesToProcessD, urlKey = "", .before = "url") %>% mutate(urlKey = gsub(":|\\.|/", "", link))
-
-
-
-
-pagesToProcessD <- pagesToProcessD %>% mutate(urlKey = gsub(":|\\.|/", "", link))
-
-
-for (i in 1:nrow(pagesToProcess)) {
-  link <- pagesToProcess$link[i]
-  archiveDay <- pagesToProcess$day[i]
+for (i in 1:nrow(pagesToProcessD)) {
+  link <- pagesToProcessD$link[i]
+  archiveDay <- pagesToProcessD$day[i]
   
-  pagesToProcess
   updatedat <- format(Sys.time(), "%a %b %d %X %Y %Z")
-  pageDF <- cbind(link = link, day = archiveDay, status = 0, updatedat = updatedat, process = "", pageDF)
-  pageJSON <- toJSON(pageDF)
+  pageJSON <- toJSON(pagesToProcessD[i, ])
   queryString <- paste0('{"link":"', link, '"}')
   updateString <- gsub("\\[|\\]", "", pageJSON)
   
-  pagesCollection$update(queryString, update = updateString, upsert = TRUE)
-  linksCollection$remove(queryString) 
+  articlesCollection$update(queryString, update = updateString, upsert = TRUE)
+  updateString <- paste0('{ "$set": {"status":2, "process":"", "updatedat":"', updatedat, '"} }')
+  pagesCollection$update(queryString, update = updateString, upsert = TRUE)  
 }
-
 
