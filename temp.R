@@ -5,11 +5,11 @@ commandArgs <- function() c("1999-09-01", "1999-09-07")
 source('add_days_to_be_processed.R')
 
 commandArgs <- function() c(100)
-source('day_process.R')
+source('01_days_process.R')
 commandArgs <- function() c(100)
-source('link_process.R')
+source('02_links_process.R')
 commandArgs <- function() c(100)
-source('page_process.R')
+source('03_pages_process.R')
 
 daysCollection <- GetCollection("daytobeprocessed")
 linksCollection <- GetCollection("linkstobeprocessed")
@@ -41,6 +41,13 @@ archivePagesLinks <- paste0(baseURL, "/", year(dayArray),
   "/", formatC(day(dayArray), width = 2, format = "d", flag = "0"), 
   "/")
 
+
+res <- system("./mystem -cl", intern = TRUE, input = "Васе показали два ящика белых медведей")
+res <- gsub("[{}]", "", res)
+res <- gsub("(\\|[^ ]+)", "", res)
+res <- gsub("\\?", "", res)
+res <- gsub("\\s+", " ", res)
+res
 
 #dayscollection$find('{ "$or": [ { "b": 6 }, { "c": 10 } ] }')
 #dayscollection$find('{ "b": { "$in" : [ 6, 8, 10]  } }')

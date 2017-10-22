@@ -186,6 +186,22 @@ TityData <- function(pagesToProcess) {
   dtD <- dtD %>% as.tbl() %>% mutate(stemTitle = str_trim(stemTitle, side = "both"), 
                                      stemMetaDescription = str_trim(stemMetaDescription, side = "both"), 
                                      stemPlaintext = str_trim(stemPlaintext, side = "both"))
+  
+  StemText <- function(textToStem) {
+    print("------------")
+    print(textToStem)
+    res <- system("./mystem -cl", intern = TRUE, input = textToStem)
+    res <- gsub("[{}]", "", res)
+    res <- gsub("(\\|[^ ]+)", "", res)
+    res <- gsub("\\?", "", res)
+    res <- gsub("\\s+", " ", res)
+    return(res)
+  }
+  
+  dtD <- dtD %>% as.tbl() %>% mutate(stemedTitle = mapply(StemText, stemTitle)) %>%
+    mutate(stemedMetaDescription = mapply(StemText, stemMetaDescription)) %>%
+    mutate(stemedPlaintext = mapply(StemText, stemPlaintext))
+
   return(dtD)  
 }
 
