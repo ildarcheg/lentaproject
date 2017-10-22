@@ -1,7 +1,7 @@
 require(rvest)
 require(jsonlite)
-source("dbmongo.R")
-source("page_parsing.R")
+source("00_dbmongo.R")
+source("00_read_html.R")
 
 args <- commandArgs()
 numberOfLinksToProcess <- as.integer(args[length(args)])

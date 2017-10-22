@@ -1,6 +1,6 @@
 require(jsonlite)
-source("dbmongo.R")
-source("page_tyding.R")
+source("00_dbmongo.R")
+source("00_tidy_page_data.R")
 
 args <- commandArgs()
 numberOfPagesToProcess <- as.integer(args[length(args)])
