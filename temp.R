@@ -42,5 +42,12 @@ archivePagesLinks <- paste0(baseURL, "/", year(dayArray),
   "/")
 
 
+res <- system("./mystem -cl", intern = TRUE, input = "Васе показали два ящика белых медведей")
+res <- gsub("[{}]", "", res)
+res <- gsub("(\\|[^ ]+)", "", res)
+res <- gsub("\\?", "", res)
+res <- gsub("\\s+", " ", res)
+res
+
 #dayscollection$find('{ "$or": [ { "b": 6 }, { "c": 10 } ] }')
 #dayscollection$find('{ "b": { "$in" : [ 6, 8, 10]  } }')
