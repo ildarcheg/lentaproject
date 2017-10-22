@@ -1,1 +1,5 @@
+install.packages("mongolite")
 install.packages("lubridate")
+install.packages("rvest")
+install.packages("dplyr")
+install.packages("tibble")

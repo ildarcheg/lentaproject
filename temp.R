@@ -4,8 +4,10 @@ source("dbmongo.R")
 commandArgs <- function() c("1999-09-01", "1999-09-07")
 source('add_days_to_be_processed.R')
 
-commandArgs <- function() c(5)
+commandArgs <- function() c(100)
 source('day_process.R')
+commandArgs <- function() c(100)
+source('link_process.R')
 
 
 daysCollection <- GetCollection("daytobeprocessed")

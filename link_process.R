@@ -28,6 +28,13 @@ for (i in 1:nrow(linksToProcess)) {
   link <- linksToProcess$link[i]
   archiveDay <- linksToProcess$day[i]
   
+  if (is.null(archivePageLink)) next
+  
+  if (nchar(link) < 20) {
+    queryString <- paste0('{"link":"', link, '"}')  
+    linksCollection$remove(queryString) 
+    next
+  }
   pageDF <- ReadLink(link, archiveDay)
   updatedat <- format(Sys.time(), "%a %b %d %X %Y %Z")
   pageDF <- cbind(link = link, day = archiveDay, status = 0, updatedat = updatedat, process = "", pageDF)
