@@ -7,6 +7,7 @@ function delimiter() {
 function message() {
 	delimiter
 	echo $1
+	echo $1 >> install.log
 	delimiter
 }
 
@@ -47,6 +48,7 @@ message "Install RStudio"
 wget https://download2.rstudio.org/rstudio-server-1.1.383-amd64.deb
 yes | sudo gdebi rstudio-server-1.1.383-amd64.deb
 rm rstudio-server-1.1.383-amd64.deb
+check_service_stat "rstudio-server"
 
 #message "Install Apache"
 #sudo apt-get --yes --force-yes install apache2
@@ -63,16 +65,25 @@ sudo apt-get install -y mongodb-org
 
 sudo service mongod start
 cat /var/log/mongodb/mongod.log
+check_service_stat "rmongod"
 
-message "Install openssl"
+message "Install libraties"
 sudo apt-get install -y libssl-dev libsasl2-dev libcurl4-openssl-dev libpq-dev libxml2-dev
 
-message "Install PostgreSQL"
-sudo apt-get update -y
-sudo apt-get install -y postgresql postgresql-contrib
-sudo -u postgres createuser --interactive
-sudo -u postgres createdb ildar
+#message "Install PostgreSQL"
+#sudo apt-get update -y
+#sudo apt-get install -y postgresql postgresql-contrib
+#sudo -u postgres createuser --interactive
+#sudo -u postgres createdb ildar
 
+
+sudo echo 'install.packages("memoise")' | sudo tee install_packages.R
+sudo echo 'require(memoise)' | sudo tee load_packages.R
+sudo echo 'install.packages("devtools")' | sudo tee install_packages.R
+sudo echo 'require(devtools)' | sudo tee install_packages.R
+sudo echo 'require(devtools)' | sudo tee load_packages.R
+sudo echo 'devtools::install_github("jayjacobs/tldextract")' | sudo tee install_packages.R
+sudo echo 'require(tldextract)' | sudo tee load_packages.R
 sudo echo 'install.packages("mongolite")' | sudo tee install_packages.R
 sudo echo 'require(mongolite)' | sudo tee load_packages.R
 sudo echo 'install.packages("lubridate")' | sudo tee -a install_packages.R
@@ -83,6 +94,20 @@ sudo echo 'install.packages("dplyr")' | sudo tee -a install_packages.R
 sudo echo 'require(dplyr)' | sudo tee -a load_packages.R
 sudo echo 'install.packages("tibble")' | sudo tee -a install_packages.R
 sudo echo 'require(tibble)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("tidyr")' | sudo tee -a install_packages.R
+sudo echo 'require(tidyr)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("data.table")' | sudo tee -a install_packages.R
+sudo echo 'require(data.table)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("stringr")' | sudo tee -a install_packages.R
+sudo echo 'require(stringr)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("tm")' | sudo tee -a install_packages.R
+sudo echo 'require(tm)' | sudo tee -a load_packages.R
+
+#wget http://download.cdn.yandex.net/mystem/mystem-3.0-linux3.1-64bit.tar.gz
+#tar -xvzf mystem-3.0-linux3.1-64bit.tar.gz
+#rm mystem-3.0-linux3.1-64bit.tar.gz
+
+
 
 #sudo echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee -a /etc/apt/sources.list.d/webupd8team-java.list
 #sudo echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | sudo tee /etc/apt/sources.list.d/webupd8team-java.list
