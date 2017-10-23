@@ -76,16 +76,20 @@ sudo apt-get install -y libssl-dev libsasl2-dev libcurl4-openssl-dev libpq-dev l
 #sudo -u postgres createuser --interactive
 #sudo -u postgres createdb ildar
 
+sudo ufw allow 234
+sudo ufw allow 8787
+sudo ufw enable
+# sudo echo '/usr/sbin/ufw enable' | sudo tee /etc/rc.local
 
 sudo echo 'install.packages("memoise")' | sudo tee install_packages.R
 sudo echo 'require(memoise)' | sudo tee load_packages.R
-sudo echo 'install.packages("devtools")' | sudo tee install_packages.R
-sudo echo 'require(devtools)' | sudo tee install_packages.R
-sudo echo 'require(devtools)' | sudo tee load_packages.R
-sudo echo 'devtools::install_github("jayjacobs/tldextract")' | sudo tee install_packages.R
-sudo echo 'require(tldextract)' | sudo tee load_packages.R
-sudo echo 'install.packages("mongolite")' | sudo tee install_packages.R
-sudo echo 'require(mongolite)' | sudo tee load_packages.R
+sudo echo 'install.packages("devtools")' | sudo tee -a install_packages.R
+sudo echo 'require(devtools)' | sudo tee -a install_packages.R
+sudo echo 'require(devtools)' | sudo tee -a load_packages.R
+sudo echo 'devtools::install_github("jayjacobs/tldextract")' | sudo tee -a install_packages.R
+sudo echo 'require(tldextract)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("mongolite")' | sudo tee -a install_packages.R
+sudo echo 'require(mongolite)' | sudo tee -a load_packages.R
 sudo echo 'install.packages("lubridate")' | sudo tee -a install_packages.R
 sudo echo 'require(lubridate)' | sudo tee -a load_packages.R
 sudo echo 'install.packages("rvest")' | sudo tee -a install_packages.R
