@@ -8,15 +8,15 @@ if (is.na(numberOfPagesToProcess)) {
   numberOfPagesToProcess <- 1
 }
 
-pagesCollection <- GetCollection("pagestobeprocessed")
-articlesCollection <- GetCollection("articlestobeprocessed")
+pagesCollection <- GetCollection(DefCollections()[3])
+articlesCollection <- GetCollection(DefCollections()[4])
 
 process <- paste0(runif(1, 1, 10), runif(1, 1, 10), collapse = "")
-updatedat <- format(Sys.time(), "%a %b %d %X %Y %Z")
+updated_at <- GetUpdatedAt()
 
 for (i in 1:numberOfPagesToProcess) {
   queryString <- paste0('{"status":0}')
-  updateString <- paste0('{ "$set": {"status":1, "process":"', process, '", "updatedat":"', updatedat, '"} }')
+  updateString <- paste0('{ "$set": {"status":1, "process":"', process, '", "updated_at":"', updated_at, '"} }')
   pagesCollection$update(query = queryString, update = updateString, upsert = FALSE, multiple = FALSE)  
 }
 
@@ -27,15 +27,16 @@ pagesToProcessD <- TityData(pagesToProcess)
 
 for (i in 1:nrow(pagesToProcessD)) {
   link <- pagesToProcessD$link[i]
-  archiveDay <- pagesToProcessD$day[i]
+  archiveDay <- pagesToProcessD$linkDate[i]
   
-  updatedat <- format(Sys.time(), "%a %b %d %X %Y %Z")
+  updated_at <- GetUpdatedAt()
+  pagesToProcessD[i, ]$status <- 0
   pageJSON <- toJSON(pagesToProcessD[i, ])
   queryString <- paste0('{"link":"', link, '"}')
   updateString <- gsub("\\[|\\]", "", pageJSON)
-  
   articlesCollection$update(queryString, update = updateString, upsert = TRUE)
-  updateString <- paste0('{ "$set": {"status":2, "process":"", "updatedat":"', updatedat, '"} }')
+  
+  updateString <- paste0('{ "$set": {"status":2, "process":"", "updated_at":"', updated_at, '"} }')
   pagesCollection$update(queryString, update = updateString, upsert = TRUE)  
 }
 

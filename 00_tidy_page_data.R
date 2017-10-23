@@ -68,19 +68,19 @@ TityData <- function(pagesToProcess) {
   # such as "13:47, 18 июля 2017" or from url such 
   # as https://lenta.ru/news/2017/07/18/frg/. Hours and Minutes set randomly
   # from 8 to 21 in last case
-  UpdateDatetime <- function (datetime, datetimeString, day) {
+  UpdateDatetime <- function (datetime, datetimeString, linkDate) {
     datetimeNew <- datetime
     if (is.na(datetime)) { 
       if (is.na(datetimeString)) {
         H <- round(runif(1, 8, 21))
         M <- round(runif(1, 1, 59))
         S <- "00"
-        datetimeString <- paste0(day, " ", 
+        datetimeString <- paste0(linkDate, " ", 
                                  paste0(c(H, M, S), collapse = ":"))
         datetimeNew <- ymd_hms(datetimeString, tz = "Europe/Moscow", quiet = TRUE)
       } else {
         timeHoursMinutes <- sub("\\,.*", "", datetimeString)
-        datetimeString <- paste0(day, " ", timeHoursMinutes, ":00")
+        datetimeString <- paste0(linkDate, " ", timeHoursMinutes, ":00")
         datetimeNew <- ymd_hms(datetimeString, tz = "Europe/Moscow", quiet = TRUE)
       }
     }  
@@ -90,7 +90,7 @@ TityData <- function(pagesToProcess) {
   # Process datetime and fill up missed values
   dtD <- dtD %>% 
     mutate(datetime = ymd_hms(datetime, tz = "Europe/Moscow", quiet = TRUE)) %>% 
-    mutate(datetimeNew = mapply(UpdateDatetime, datetime, datetimeString, day)) %>%
+    mutate(datetimeNew = mapply(UpdateDatetime, datetime, datetimeString, linkDate)) %>%
     mutate(datetime = as.POSIXct(datetimeNew, tz = "Europe/Moscow",origin = "1970-01-01")) %>%
     select(-datetimeNew)
   
@@ -188,8 +188,6 @@ TityData <- function(pagesToProcess) {
                                      stemPlaintext = str_trim(stemPlaintext, side = "both"))
   
   StemText <- function(textToStem) {
-    print("------------")
-    print(textToStem)
     res <- system("./mystem -cl", intern = TRUE, input = textToStem)
     res <- gsub("[{}]", "", res)
     res <- gsub("(\\|[^ ]+)", "", res)

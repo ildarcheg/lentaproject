@@ -9,15 +9,15 @@ if (is.na(numberOfLinksToProcess)) {
   numberOfLinksToProcess <- 1
 }
 
-linksCollection <- GetCollection("linkstobeprocessed")
-pagesCollection <- GetCollection("pagestobeprocessed")
+linksCollection <- GetCollection(DefCollections()[2])
+pagesCollection <- GetCollection(DefCollections()[3])
 
 process <- paste0(runif(1, 1, 10), runif(1, 1, 10), collapse = "")
-updatedat <- format(Sys.time(), "%a %b %d %X %Y %Z")
+updated_at <- GetUpdatedAt()
 
 for (i in 1:numberOfLinksToProcess) {
   queryString <- paste0('{"status":0}')
-  updateString <- paste0('{ "$set": {"status":1, "process":"', process, '", "updatedat":"', updatedat, '"} }')
+  updateString <- paste0('{ "$set": {"status":1, "process":"', process, '", "updated_at":"', updated_at, '"} }')
   linksCollection$update(query = queryString, update = updateString, upsert = FALSE, multiple = FALSE)  
 }
 
@@ -26,7 +26,7 @@ linksToProcess <- linksCollection$find(queryString)
 
 for (i in 1:nrow(linksToProcess)) {
   link <- linksToProcess$link[i]
-  archiveDay <- linksToProcess$day[i]
+  archiveDay <- linksToProcess$linkDate[i]
   
   if (is.null(link)) next
 
@@ -36,14 +36,14 @@ for (i in 1:nrow(linksToProcess)) {
     next
   }
   pageDF <- ReadLink(link, archiveDay)
-  updatedat <- format(Sys.time(), "%a %b %d %X %Y %Z")
-  pageDF <- cbind(link = link, day = archiveDay, status = 0, updatedat = updatedat, process = "", pageDF)
+  updated_at <- GetUpdatedAt()
+  pageDF <- cbind(link = link, linkDate = archiveDay, status = 0, updated_at = updated_at, process = "", pageDF)
   pageJSON <- toJSON(pageDF)
   queryString <- paste0('{"link":"', link, '"}')
   updateString <- gsub("\\[|\\]", "", pageJSON)
 
   pagesCollection$update(queryString, update = updateString, upsert = TRUE)
-  updateString <- paste0('{ "$set": {"status":2, "process":"", "updatedat":"', updatedat, '"} }')
+  updateString <- paste0('{ "$set": {"status":2, "process":"", "updated_at":"', updated_at, '"} }')
   linksCollection$update(queryString, update = updateString, upsert = TRUE)
 }
 

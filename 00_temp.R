@@ -1,29 +1,37 @@
-source("dbmongo.R")
+source("00_dbmongo.R")
 
 
 commandArgs <- function() c("1999-09-01", "1999-09-07")
-source('add_days_to_be_processed.R')
+source('00_add_days.R')
 
 commandArgs <- function() c(100)
 source('01_days_process.R')
+
 commandArgs <- function() c(100)
 source('02_links_process.R')
+
 commandArgs <- function() c(100)
 source('03_pages_process.R')
 
-daysCollection <- GetCollection("daytobeprocessed")
-linksCollection <- GetCollection("linkstobeprocessed")
-pageCollection <- GetCollection("pagestobeprocessed")
-articlesCollection <- GetCollection("articlestobeprocessed")
 
-daysCollection$find()
-linksCollection$find()
-pageCollection$find()
-articlesCollection$find()
+updated_at <- GetUpdatedAt()
+updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
+GetCollection(DefCollections()[2])$update('{}', update = updateString, upsert = FALSE, multiple = TRUE)  
 
-updatedat <- format(Sys.time(), "%a %b %d %X %Y %Z")
-updateString <- paste0('{ "$set": {"status":0, "process":"", "updatedat":"', updatedat, '"} }')
-pagesCollection$update('{}', update = updateString, upsert = FALSE, multiple = TRUE)  
+updated_at <- GetUpdatedAt()
+queryString <- paste0('{"status":1}')
+updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
+GetCollection(DefCollections()[2])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE)  
+
+updated_at <- GetUpdatedAt()
+queryString <- paste0('{"status":2}')
+updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
+GetCollection(DefCollections()[3])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE)  
+
+updated_at <- GetUpdatedAt()
+queryString <- paste0('{"status":1}')
+updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
+GetCollection(DefCollections()[4])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE)  
 
 daysCollection$drop()
 linksCollection$drop()
