@@ -64,6 +64,7 @@ sudo apt-get update -y
 sudo apt-get install -y mongodb-org
 
 sudo service mongod start
+sudo systemctl enable mongod
 cat /var/log/mongodb/mongod.log
 check_service_stat "rmongod"
 
@@ -79,6 +80,8 @@ sudo apt-get install -y libssl-dev libsasl2-dev libcurl4-openssl-dev libpq-dev l
 sudo ufw allow 234
 sudo ufw allow 8787
 sudo ufw enable
+sudo systemctl enable ufw
+
 # sudo echo '/usr/sbin/ufw enable' | sudo tee /etc/rc.local
 
 sudo echo 'install.packages("memoise")' | sudo tee install_packages.R
