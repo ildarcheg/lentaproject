@@ -1,5 +1,0 @@
-require(mongolite)
-require(lubridate)
-require(rvest)
-require(dplyr)
-require(tibble)
