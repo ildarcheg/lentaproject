@@ -6,6 +6,7 @@ for (i in 1:length(collections)) {
   collection$index(add = "link")
   collection$index(add = "status")
   collection$index(add = "process")
+  collection$index(add = "updated_at")
 }
 
 baseURL <- "https://lenta.ru"

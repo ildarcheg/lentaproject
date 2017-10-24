@@ -33,6 +33,12 @@ queryString <- paste0('{"status":1}')
 updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
 GetCollection(DefCollections()[4])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE)  
 
+# REMOVE
+GetCollection(DefCollections()[1])$remove('{}')
+GetCollection(DefCollections()[2])$remove('{}')
+GetCollection(DefCollections()[3])$remove('{}')
+GetCollection(DefCollections()[4])$remove('{}')
+
 daysCollection$drop()
 linksCollection$drop()
 pageCollection$drop()

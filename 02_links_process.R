@@ -12,6 +12,13 @@ if (is.na(numberOfLinksToProcess)) {
 linksCollection <- GetCollection(DefCollections()[2])
 pagesCollection <- GetCollection(DefCollections()[3])
 
+log <- c()
+log <- c(log, numberOfLinksToProcess)
+log <- c(log, DefCollections()[2])
+log <- c(log, linksCollection$count())
+
+writeLines(log, "my.log")
+
 process <- paste0(runif(1, 1, 10), runif(1, 1, 10), collapse = "")
 updated_at <- GetUpdatedAt()
 
