@@ -2,6 +2,8 @@ require(jsonlite)
 source("00_dbmongo.R")
 source("00_tidy_page_data.R")
 
+stopifnot(GetCPULoad() < 85)
+
 args <- commandArgs()
 numberOfPagesToProcess <- as.integer(args[length(args)])
 if (is.na(numberOfPagesToProcess)) {

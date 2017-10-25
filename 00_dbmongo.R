@@ -1,4 +1,5 @@
 require(mongolite)
+source("00_utils.R")
 
 GetUpdatedAt <- function() {
   updated_at <- format(Sys.time(), "%Y%m%d%H%M%S %Z") 
@@ -6,11 +7,6 @@ GetUpdatedAt <- function() {
 GetCollection <- function(collectionName) {
   collection <- mongo(collection = collectionName, db = "lenta", url = "mongodb://localhost")
   return(collection)
-}
-
-DefCollections <- function() {
-  collections <- c("c01_daytobeprocessed", "c02_linkstobeprocessed", "c03_pagestobeprocessed", "c04_articlestobeprocessed")
-  return(collections)
 }
 
 GetDefaultValue <- function(key) {
@@ -34,3 +30,4 @@ SetDefaultValue <- function(key, value) {
 }
 
 defaultsCollection <- GetCollection("c00_defaults")
+scheduleCollection <- GetCollection("c00_schedule")
