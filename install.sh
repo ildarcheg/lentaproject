@@ -82,6 +82,10 @@ sudo ufw allow 8787
 sudo ufw enable
 sudo systemctl enable ufw
 
+sudo setfacl -m u:ildar:rwx /etc/crontab
+sudo setfacl -x u:ildar /etc/crontab
+sudo getfacl /etc/crontab 
+
 # sudo echo '/usr/sbin/ufw enable' | sudo tee /etc/rc.local
 
 sudo echo 'install.packages("memoise")' | sudo tee install_packages.R
