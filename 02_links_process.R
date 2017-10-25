@@ -3,6 +3,8 @@ require(jsonlite)
 source("00_dbmongo.R")
 source("00_read_html.R")
 
+#stopifnot(GetCPULoad() < 85)
+
 args <- commandArgs()
 numberOfLinksToProcess <- as.integer(args[length(args)])
 if (is.na(numberOfLinksToProcess)) {
@@ -12,7 +14,8 @@ if (is.na(numberOfLinksToProcess)) {
 linksCollection <- GetCollection(DefCollections()[2])
 pagesCollection <- GetCollection(DefCollections()[3])
 
-log <- c()
+log <- readLines("my.log")
+log <- c(log, Sys.time())
 log <- c(log, numberOfLinksToProcess)
 log <- c(log, DefCollections()[2])
 log <- c(log, linksCollection$count())

@@ -1,6 +1,8 @@
 require(rvest)
 source("00_dbmongo.R")
 
+stopifnot(GetCPULoad() < 85)
+
 args <- commandArgs()
 numberOfDaysToProcess <- as.integer(args[length(args)])
 if (is.na(numberOfDaysToProcess)) {

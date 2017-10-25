@@ -20,5 +20,3 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
-*/1 *   * * *   cd /home/ildar/lentaproject/; Rscript 01_days_process.R 5 # LENTA R SCRIPT
-*/1 *   * * *   cd /home/ildar/lentaproject/; Rscript 02_links_process.R 25 # LENTA R SCRIPT
