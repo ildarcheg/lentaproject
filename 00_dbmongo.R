@@ -1,4 +1,4 @@
-require(mongolite)
+require(mongolite, quietly = TRUE)
 source("00_utils.R")
 
 GetUpdatedAt <- function() {

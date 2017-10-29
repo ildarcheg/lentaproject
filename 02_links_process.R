@@ -1,5 +1,5 @@
-require(rvest)
-require(jsonlite)
+require(rvest, quietly = TRUE)
+require(jsonlite, quietly = TRUE)
 source("00_dbmongo.R")
 source("00_read_html.R")
 

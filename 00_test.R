@@ -1,2 +1,7 @@
 source("00_dbmongo.R")
-GetPerformance()
+dt <- GetDBStatus()
+as.data.frame(dt)
+dt <- GetPerformance()
+as.data.frame(dt)
+sum(dt$cpu)
+GetCPULoad()

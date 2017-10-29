@@ -1,4 +1,4 @@
-require(lubridate)
+require(lubridate, quietly = TRUE)
 source("00_dbmongo.R")
 
 args <- commandArgs()

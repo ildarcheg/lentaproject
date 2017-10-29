@@ -1,4 +1,4 @@
-require("RPostgreSQL")
+require("RPostgreSQL", quietly = TRUE)
 
 drv <- dbDriver('PostgreSQL')  
 db <- 'ildar'  

@@ -1,4 +1,4 @@
-require(rvest)
+require(rvest, quietly = TRUE)
 source("00_dbmongo.R")
 
 stopifnot(GetCPULoad() < 85)

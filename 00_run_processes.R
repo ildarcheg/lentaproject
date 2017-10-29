@@ -1,12 +1,16 @@
-print("run 1")
-system("Rscript 02_links_process.R 100", wait=FALSE)
-print("run 2")
-system("Rscript 02_links_process.R 100", wait=FALSE)
-print("run 3")
-system("Rscript 02_links_process.R 100", wait=FALSE)
-print("run 4")
-system("Rscript 03_pages_process.R 100", wait=FALSE)
-print("run 5")
-system("Rscript 03_pages_process.R 100", wait=FALSE)
-print("run 6")
-system("Rscript 03_pages_process.R 100", wait=FALSE)
+source("00_dbmongo.R")
+cpu <- GetCPULoadFromLog()
+
+stopifnot(cpu<85)
+
+dt <- GetPerformance()
+dtStatus <- GetDBStatus() %>% filter(coll != "c04_articlestobeprocessed") %>% filter(status0 != 0) %>% arrange(status1, -status0)
+print(dtStatus)
+stopifnot(nrow(dtStatus) != 0)
+
+coll <- dtStatus$coll[1]
+scriptToRun <- DefScripts()[DefCollections() == coll]
+
+commandToRun <- paste0("Rscript ", scriptToRun," 100")
+print(paste0("Running: ", commandToRun))
+system(commandToRun, wait=FALSE)

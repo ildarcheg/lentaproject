@@ -1,4 +1,4 @@
-require(rvest)
+require(rvest, quietly = TRUE)
 
 SetNAIfZeroLength <- function(param) {
   param <- param[!is.na(param)]

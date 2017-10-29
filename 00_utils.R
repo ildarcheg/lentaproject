@@ -1,7 +1,7 @@
-require(tibble)
-require(dplyr)
-require(tm)
-require(stringr)
+require(tibble, quietly = TRUE)
+require(dplyr, quietly = TRUE, warn.conflicts = FALSE)
+require(tm, quietly = TRUE)
+require(stringr, quietly = TRUE)
 
 DefCollections <- function() {
   collections <- c("c01_daytobeprocessed", "c02_linkstobeprocessed", "c03_pagestobeprocessed", "c04_articlestobeprocessed")
@@ -9,13 +9,19 @@ DefCollections <- function() {
 }
 
 DefScripts <- function() {
-  scripts <- c("01_days_process.R", "02_links_process.R", "03_pages_process.R", "04_articles_pprocess.R")
+  scripts <- c("01_days_process.R", "02_links_process.R", "03_pages_process.R", "04_articles_process.R")
   return(scripts)
 }
 
 GetCPULoad <- function() {
   cpu <- system("sar 2 3", intern = TRUE)[7] %>% stripWhitespace %>% str_split(" ")
   cpu <- cpu[[1]][3]
+  cpu <- as.numeric(cpu)
+  return(cpu)
+}
+
+GetCPULoadFromLog <- function() {
+  cpu <- system("cat cpu_performance.log", intern = TRUE)
   cpu <- as.numeric(cpu)
   return(cpu)
 }

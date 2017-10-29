@@ -1,4 +1,4 @@
-require(jsonlite)
+require(jsonlite, quietly = TRUE)
 source("00_dbmongo.R")
 source("00_tidy_page_data.R")
 

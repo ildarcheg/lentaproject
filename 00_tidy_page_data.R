@@ -1,11 +1,11 @@
-require(dplyr)
-require(tibble)
-require(tidyr)
-require(data.table)
-require(tldextract)
-require(stringr)
-require(tm)
-require(lubridate)
+require(dplyr, quietly = TRUE)
+require(tibble, quietly = TRUE)
+require(tidyr, quietly = TRUE)
+require(data.table, quietly = TRUE)
+require(tldextract, quietly = TRUE)
+require(stringr, quietly = TRUE)
+require(tm, quietly = TRUE)
+require(lubridate, quietly = TRUE)
 
 TityData <- function(pagesToProcess) {
 

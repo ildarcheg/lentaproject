@@ -20,3 +20,15 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
+* *   * * *   cd /home/ildar/lentaproject/; sleep 00; Rscript 00_log_cpu.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 10; Rscript 00_log_cpu.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 20; Rscript 00_log_cpu.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 30; Rscript 00_log_cpu.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 40; Rscript 00_log_cpu.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 50; Rscript 00_log_cpu.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 00; Rscript 00_run_processes.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 10; Rscript 00_run_processes.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 20; Rscript 00_run_processes.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 30; Rscript 00_run_processes.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 40; Rscript 00_run_processes.R # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 50; Rscript 00_run_processes.R # LENTA R SCRIPT
