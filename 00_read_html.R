@@ -1,10 +1,45 @@
 require(rvest, quietly = TRUE)
+require(jsonlite, quietly = TRUE)
+require(dplyr, quietly = TRUE)
 
 SetNAIfZeroLength <- function(param) {
   param <- param[!is.na(param)]
   paramLength <- length(param)
   if (paramLength==0) {param <- NA}
   return(param)
+}
+
+ReadComment <- function(link, archiveDay) {
+  
+  link <- "https://lenta.ru/news/2017/10/27/skrepi/"
+  linkToRead <- paste0("https://c.rambler.ru/api/app/126/widget/init/?appId=126&xid=", 
+                       URLencode(link , reserved = TRUE))
+  pg <- read_html(linkToRead, encoding = "UTF-8")
+  jsonReply <- pg %>% html_text() %>% fromJSON() 
+  
+  if (is.null(jsonReply$comments)) { return(data.frame()) }
+  
+  columnNames <- names(jsonReply$comments)
+  columnsToKeep <- c("id", 
+                     "hasLink", 
+                     "hasGreyWord", 
+                     "text", 
+                     "moderation", 
+                     "rating", 
+                     "createdAt", 
+                     "parentId", 
+                     "sessionSourceIcon", 
+                     "userId", 
+                     "userpic", 
+                     "displayName", 
+                     "username",
+                     "level",
+                     "childrenCount",
+                     "hasChild")
+  columns <- intersect(columnNames, columnsToKeep)
+  comments <- jsonReply$comments %>% select(columns)
+  
+  comments
 }
 
 ReadLink <- function(link, archiveDay) {

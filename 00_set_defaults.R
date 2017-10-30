@@ -1,4 +1,5 @@
 source("00_dbmongo.R")
+source("00_set_schedules.R")
 
 collections <- DefCollections()
 for (i in 1:length(collections)) {

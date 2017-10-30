@@ -11,6 +11,6 @@ stopifnot(nrow(dtStatus) != 0)
 coll <- dtStatus$coll[1]
 scriptToRun <- DefScripts()[DefCollections() == coll]
 
-commandToRun <- paste0("Rscript ", scriptToRun," 100")
+commandToRun <- paste0("Rscript ", scriptToRun," 50")
 print(paste0("Running: ", commandToRun))
 system(commandToRun, wait=FALSE)

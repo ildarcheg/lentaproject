@@ -4,12 +4,18 @@ require(tm, quietly = TRUE)
 require(stringr, quietly = TRUE)
 
 DefCollections <- function() {
-  collections <- c("c01_daytobeprocessed", "c02_linkstobeprocessed", "c03_pagestobeprocessed", "c04_articlestobeprocessed")
+  collections <- c("c01_daytobeprocessed", 
+                   "c02_linkstobeprocessed", 
+                   "c03_pagestobeprocessed", 
+                   "c04_articlestobeprocessed")
   return(collections)
 }
 
 DefScripts <- function() {
-  scripts <- c("01_days_process.R", "02_links_process.R", "03_pages_process.R", "04_articles_process.R")
+  scripts <- c("01_days_process.R", 
+               "02_links_process.R", 
+               "03_pages_process.R", 
+               "04_articles_process.R")
   return(scripts)
 }
 

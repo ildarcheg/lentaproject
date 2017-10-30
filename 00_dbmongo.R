@@ -30,4 +30,3 @@ SetDefaultValue <- function(key, value) {
 }
 
 defaultsCollection <- GetCollection("c00_defaults")
-scheduleCollection <- GetCollection("c00_schedule")

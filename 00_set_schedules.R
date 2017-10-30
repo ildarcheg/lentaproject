@@ -1,9 +1,4 @@
-source("00_dbmongo.R", quietly = TRUE)
-
-scheduleCollection$find()
-
-commandArgs <- function() c("1999-09-01", "2001-12-31")
-source('00_add_days.R')
+source("00_dbmongo.R")
 
 crontabToAdd <- c()
 crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 00; Rscript 00_log_cpu.R # LENTA R SCRIPT')
