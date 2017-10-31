@@ -1,6 +1,7 @@
 require(rvest, quietly = TRUE)
 require(jsonlite, quietly = TRUE)
 require(dplyr, quietly = TRUE)
+require(stringr, quietly = TRUE)
 
 SetNAIfZeroLength <- function(param) {
   param <- param[!is.na(param)]
@@ -9,35 +10,56 @@ SetNAIfZeroLength <- function(param) {
   return(param)
 }
 
+ReadSocial <- function(link, archiveDay) {
+  linkEncode <- URLencode(link , reserved = TRUE)
+  linkToReadFB <- paste0("https://graph.facebook.com/?fields=engagement&access_token=144213186161556|oTvA5NHlj3DdBNmzjp8zwnf-JlA&ids=", linkEncode)
+  linkToReadVK <- paste0("https://vk.com/share.php?act=count&index=1&url=", linkEncode, "&format=json")
+  linkToReadOK <- paste0("https://connect.ok.ru/dk?st.cmd=extLike&uid=okLenta&ref=", linkEncode, "")
+  linkToReadCom <- paste0("https://c.rambler.ru/api/app/126/comments-count?xid=", linkEncode, "")
+  FB <- read_html(linkToReadFB) %>% html_text() %>% fromJSON()
+  if (length(FB) == 0) { FB <- 0 } else { FB <- FB[[1]]$engagement$share_count }
+  VK <- read_html(linkToReadVK) %>% html_text() %>% str_replace_all(" |.*\\,|\\);", "") %>% as.integer()
+  OK <- read_html(linkToReadOK) %>% html_text() %>% str_replace_all(" |.*\\,|\\);|'", "") %>% as.integer()
+  Com <- read_html(linkToReadCom) %>% html_text() %>% fromJSON()
+  if (length(Com$xids) == 0) { Com <- 0 } else { Com <- Com$xids[[1]] }
+  data.frame(FB = FB,
+             VK= VK,
+             OK= OK,
+             Com= Com,
+             stringsAsFactors=FALSE)
+}
+
 ReadComment <- function(link, archiveDay) {
-  
-  link <- "https://lenta.ru/news/2017/10/27/skrepi/"
+  linkEncode <- URLencode(link , reserved = TRUE)
   linkToRead <- paste0("https://c.rambler.ru/api/app/126/widget/init/?appId=126&xid=", 
-                       URLencode(link , reserved = TRUE))
+                       linkEncode)
   pg <- read_html(linkToRead, encoding = "UTF-8")
   jsonReply <- pg %>% html_text() %>% fromJSON() 
   
-  if (is.null(jsonReply$comments)) { return(data.frame()) }
-  
-  columnNames <- names(jsonReply$comments)
-  columnsToKeep <- c("id", 
-                     "hasLink", 
-                     "hasGreyWord", 
-                     "text", 
-                     "moderation", 
-                     "rating", 
-                     "createdAt", 
-                     "parentId", 
-                     "sessionSourceIcon", 
-                     "userId", 
-                     "userpic", 
-                     "displayName", 
-                     "username",
-                     "level",
-                     "childrenCount",
-                     "hasChild")
-  columns <- intersect(columnNames, columnsToKeep)
-  comments <- jsonReply$comments %>% select(columns)
+  if (is.null(jsonReply$comments)) { 
+    comments <- data.frame()
+  } else {
+    columnNames <- names(jsonReply$comments)
+    columnsToKeep <- c("id", 
+                       "hasLink", 
+                       "hasGreyWord", 
+                       "text", 
+                       "moderation", 
+                       "rating", 
+                       "createdAt", 
+                       "parentId", 
+                       "sessionSourceIcon", 
+                       "userId", 
+                       "userpic", 
+                       "displayName", 
+                       "username",
+                       "level",
+                       "childrenCount",
+                       "hasChild")
+    columns <- intersect(columnNames, columnsToKeep)
+    comments <- jsonReply$comments %>% select(columns) 
+    comments <- as.data.frame(comments)
+  }
   
   comments
 }

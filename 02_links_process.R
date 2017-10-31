@@ -4,26 +4,25 @@ source("00_dbmongo.R")
 source("00_read_html.R")
 
 #stopifnot(GetCPULoad() < 85)
+print(paste0("START: ", format(Sys.time(), "%Y-%m-%d-%H-%M-%S %Z")))
 
 args <- commandArgs()
+print(paste0("Arguments: ", args))
 numberOfLinksToProcess <- as.integer(args[length(args)])
 if (is.na(numberOfLinksToProcess)) {
   numberOfLinksToProcess <- 1
 }
+print(paste0("After arguments: ", format(Sys.time(), "%Y-%m-%d-%H-%M-%S %Z")))
 
 linksCollection <- GetCollection(DefCollections()[2])
+print(paste0("links: ", linksCollection$count()))
 pagesCollection <- GetCollection(DefCollections()[3])
-
-log <- readLines("my.log")
-log <- c(log, Sys.time())
-log <- c(log, numberOfLinksToProcess)
-log <- c(log, DefCollections()[2])
-log <- c(log, linksCollection$count())
-
-writeLines(log, "my.log")
+print(paste0("pages: ", pagesCollection$count()))
 
 process <- paste0(runif(1, 1, 10), runif(1, 1, 10), collapse = "")
+print(paste0("process: ", process))
 updated_at <- GetUpdatedAt()
+print(paste0("updated_at: ", updated_at))
 
 for (i in 1:numberOfLinksToProcess) {
   queryString <- paste0('{"status":0}')
@@ -46,11 +45,15 @@ for (i in 1:nrow(linksToProcess)) {
     next
   }
   pageDF <- ReadLink(link, archiveDay)
+  socialDF <- ReadSocial(link, archiveDay)
+  commentDF <- ReadComment(link, archiveDay)
+  
   updated_at <- GetUpdatedAt()
-  pageDF <- cbind(link = link, linkDate = archiveDay, status = 0, updated_at = updated_at, process = "", pageDF)
-  pageJSON <- toJSON(pageDF)
+  pageDF <- cbind(link = link, linkDate = archiveDay, status = 0, updated_at = updated_at, process = "", pageDF, socialDF, commentDF, stringsAsFactors = FALSE)
   queryString <- paste0('{"link":"', link, '"}')
-  updateString <- gsub("\\[|\\]", "", pageJSON)
+  
+  pageJSON <- toJSON(pageDF)
+  updateString <- gsub("\\[|\\]", "", pageJSON)  
 
   pagesCollection$update(queryString, update = updateString, upsert = TRUE)
   updateString <- paste0('{ "$set": {"status":2, "process":"", "updated_at":"', updated_at, '"} }')

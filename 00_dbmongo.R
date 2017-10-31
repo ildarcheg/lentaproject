@@ -1,4 +1,5 @@
 require(mongolite, quietly = TRUE)
+require(jsonlite, quietly = TRUE)
 source("00_utils.R")
 
 GetUpdatedAt <- function() {

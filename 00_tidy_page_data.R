@@ -200,6 +200,16 @@ TityData <- function(pagesToProcess) {
     mutate(stemedMetaDescription = mapply(StemText, stemMetaDescription)) %>%
     mutate(stemedPlaintext = mapply(StemText, stemPlaintext))
 
+  for (i in 1:nrow(dtD)) {
+    comments <- dtD$comments[i]
+    commentsDF <- StringToDF(comments)
+    
+    if (is.character(commentsDF)&&(commentsDF == "")) { next }
+    
+    commentsDF <- commentsDF %>% as.tbl() %>% mutate(stemedText = mapply(StemText, text))
+    dtD$comments[i] <- commentsDF %>% toJSON() %>% as.character()
+  }
+  
   return(dtD)  
 }
 

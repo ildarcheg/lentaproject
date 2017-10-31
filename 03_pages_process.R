@@ -2,7 +2,7 @@ require(jsonlite, quietly = TRUE)
 source("00_dbmongo.R")
 source("00_tidy_page_data.R")
 
-stopifnot(GetCPULoad() < 85)
+#stopifnot(GetCPULoad() < 85)
 
 args <- commandArgs()
 numberOfPagesToProcess <- as.integer(args[length(args)])
@@ -33,9 +33,9 @@ for (i in 1:nrow(pagesToProcessD)) {
   
   updated_at <- GetUpdatedAt()
   pagesToProcessD[i, ]$status <- 0
-  pageJSON <- toJSON(pagesToProcessD[i, ])
   queryString <- paste0('{"link":"', link, '"}')
-  updateString <- gsub("\\[|\\]", "", pageJSON)
+  pageJSON <- toJSON(pagesToProcessD[i, ])
+  updateString <- gsub("\\[|\\]", "", pageJSON)  
   articlesCollection$update(queryString, update = updateString, upsert = TRUE)
   
   updateString <- paste0('{ "$set": {"status":2, "process":"", "updated_at":"', updated_at, '"} }')

@@ -20,14 +20,15 @@ DefScripts <- function() {
 }
 
 GetCPULoad <- function() {
-  cpu <- system("sar 2 3", intern = TRUE)[7] %>% stripWhitespace %>% str_split(" ")
+  cpu <- system("sar 1 5", intern = TRUE)[9] %>% stripWhitespace %>% str_split(" ")
   cpu <- cpu[[1]][3]
   cpu <- as.numeric(cpu)
   return(cpu)
 }
 
 GetCPULoadFromLog <- function() {
-  cpu <- system("cat cpu_performance.log", intern = TRUE)
+  cpu <- system("cat cpu_performance.log", intern = TRUE)[9] %>% stripWhitespace %>% str_split(" ")
+  cpu <- cpu[[1]][3]
   cpu <- as.numeric(cpu)
   return(cpu)
 }
@@ -98,3 +99,48 @@ GetPerformance <- function() {
   dfPerformance  
 }
 
+toJsonString <- function(dt) {
+  if (nrow(dt) !=1) {
+    return('{}')
+  } else {
+    values <- c()
+    columns <- names(dt)
+    for (i in 1:length(columns)) {
+      columnName <- columns[i]
+      value <- dt[1, columnName]
+      if (!is.integer(value)&&!is.numeric(value)) { value <- paste0('"', value,'"') }
+      values <- c(values, paste0('"', columnName,'":',value))  
+    }
+  } 
+  values <- paste0(values, collapse = ",")
+  values <- paste0("{", values, "}")
+  return(values)
+}
+
+DFToString <- function(df) {
+  if (nrow(df) == 0) {
+    return("")
+  }
+  
+  rows <- c(paste0(names(df), collapse = "-tab0tab-"))
+  for (i in 1:nrow(df)) {
+    rowText <- c()
+    for (k in 1:length(names(df))) {
+      rowText <- c(rowText, as.character(df[i,k])) 
+    }
+    rowText <- paste0(rowText, collapse = "-tab0tab-")
+    rows <- c(rows, rowText)
+  }
+  stringFromDF <- paste0(rows, collapse = "-tab7tab-")  
+  return(stringFromDF)
+}
+
+StringToDF <- function(string) {
+  if (string == "") {
+    return(data.frame())
+  }
+  rows <- str_split(string, "-tab7tab-", simplify = TRUE)
+  dfNames <- str_split(rows[1], "-tab0tab-", simplify = TRUE)
+  df <- setNames(data.frame(str_split(rows[2:length(rows)], "-tab0tab-", simplify = TRUE)), dfNames)
+  return(df)
+}

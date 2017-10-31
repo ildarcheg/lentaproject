@@ -46,6 +46,19 @@ queryString <- paste0('{"status":1}')
 updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
 GetCollection(DefCollections()[4])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE)  
 
+links <- GetCollection(DefCollections()[3])$find()$link
+for (i in 1:length(links)) {
+  link <- links[i]
+  print(i)
+  print(link)
+  #socialDF <- ReadSocial(link, "archiveDay")
+  commentDF <- ReadComment(link, "archiveDay")
+  ss <- commentDF %>% toJSON() %>% as.character()
+  commentDF <- fromJSON(ss)
+}
+pageDF <- ReadLink(link, archiveDay)
+
+
 # REMOVE
 GetCollection(DefCollections()[1])$remove('{}')
 GetCollection(DefCollections()[2])$remove('{}')
