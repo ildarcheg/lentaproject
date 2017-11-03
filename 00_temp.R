@@ -1,7 +1,7 @@
 source("00_dbmongo.R")
 
 
-commandArgs <- function() c(as.Date(Sys.time())-7, as.Date(Sys.time()))
+commandArgs <- function() c(as.Date(Sys.time())-30, as.Date(Sys.time()))
 source('00_add_days.R')
 
 commandArgs <- function() c("1999-09-01", "2001-12-31")
@@ -13,10 +13,10 @@ source('00_add_days.R')
 commandArgs <- function() c(100)
 source('01_days_process.R')
 
-commandArgs <- function() c(100)
+commandArgs <- function() c(10)
 source('02_links_process.R')
 
-commandArgs <- function() c(100)
+commandArgs <- function() c(10)
 source('03_pages_process.R')
 
 

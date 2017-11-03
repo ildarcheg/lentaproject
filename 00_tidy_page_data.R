@@ -7,11 +7,11 @@ require(stringr, quietly = TRUE)
 require(tm, quietly = TRUE)
 require(lubridate, quietly = TRUE)
 
-TityData <- function(pagesToProcess) {
+TityData <- function(pages) {
 
   # SECTION 1
   # Create urlKey column as a key
-  dtD <- pagesToProcess %>% 
+  dtD <- pages %>% 
     add_column(urlKey = "", .before = "url") %>% 
     mutate(urlKey = gsub(":|\\.|/", "", link))
   
@@ -88,9 +88,16 @@ TityData <- function(pagesToProcess) {
   }
   
   # Process datetime and fill up missed values
+  fieldsToProcess <- c("datetime")
+  fieldsExist <- all(is.element(fieldsToProcess, names(dtD)))
+  if (!fieldsExist) { dtD$datetime <- NA }
+  fieldsToProcess <- c("datetimeString")
+  fieldsExist <- all(is.element(fieldsToProcess, names(dtD)))
+  if (!fieldsExist) { dtD$datetimeString <- NA }
+  
   dtD <- dtD %>% 
     mutate(datetime = ymd_hms(datetime, tz = "Europe/Moscow", quiet = TRUE)) %>% 
-    mutate(datetimeNew = mapply(UpdateDatetime, datetime, datetimeString, linkDate)) %>%
+    mutate(datetimeNew = mapply(UpdateDatetime, datetime, datetimeString, dateToUse)) %>%
     mutate(datetime = as.POSIXct(datetimeNew, tz = "Europe/Moscow",origin = "1970-01-01")) %>%
     select(-datetimeNew)
   
@@ -106,16 +113,24 @@ TityData <- function(pagesToProcess) {
   symbolsHttp2 <- "http://http://|https://https://"
   symbolsReplace <- "[а-я|А-Я|#!]"
   
+  fieldsToProcess <- c("plaintextLinks")
+  fieldsExist <- all(is.element(fieldsToProcess, names(dtD)))
+  if (fieldsExist) {
   dtD <- dtD %>% 
     mutate(plaintextLinks = gsub(symbolsToRemove,"", plaintextLinks)) %>%
     mutate(plaintextLinks = gsub(symbolsHttp, "http://", plaintextLinks)) %>%
     mutate(plaintextLinks = gsub(symbolsReplace, "e", plaintextLinks)) %>%
-    mutate(plaintextLinks = gsub(symbolsHttp2, "http://", plaintextLinks)) %>%
-    mutate(additionalLinks = gsub(symbolsToRemove,"", additionalLinks)) %>%
-    mutate(additionalLinks = gsub(symbolsHttp, "http://", additionalLinks)) %>%
-    mutate(additionalLinks = gsub(symbolsReplace, "e", additionalLinks)) %>%
-    mutate(additionalLinks = gsub(symbolsHttp2, "http://", additionalLinks))
-  
+    mutate(plaintextLinks = gsub(symbolsHttp2, "http://", plaintextLinks))
+  }
+  fieldsToProcess <- c("additionalLinks")
+  fieldsExist <- all(is.element(fieldsToProcess, names(dtD)))
+  if (fieldsExist) {
+    dtD <- dtD %>% 
+      mutate(additionalLinks = gsub(symbolsToRemove,"", additionalLinks)) %>%
+      mutate(additionalLinks = gsub(symbolsHttp, "http://", additionalLinks)) %>%
+      mutate(additionalLinks = gsub(symbolsReplace, "e", additionalLinks)) %>%
+      mutate(additionalLinks = gsub(symbolsHttp2, "http://", additionalLinks))    
+  }
   # SECTION 7
   # Clean additionalLinks and plaintextLinks using UpdateAdditionalLinks 
   # function. Links such as:
@@ -159,14 +174,27 @@ TityData <- function(pagesToProcess) {
   # function. Links such as:
   # "http://www.dw.com/ru/../B2 https://www.welt.de/politik/.../de/"
   # should be represented as "dw.com welt.de" 
-  dtD <- dtD %>% 
-    mutate(plaintextLinks = mapply(UpdateAdditionalLinks, plaintextLinks, url)) %>%
-    mutate(additionalLinks = mapply(UpdateAdditionalLinks, additionalLinks, url))
+  fieldsToProcess <- c("plaintextLinks")
+  fieldsExist <- all(is.element(fieldsToProcess, names(dtD)))
+  if (fieldsExist) {
+    dtD <- dtD %>% 
+      mutate(plaintextLinks = mapply(UpdateAdditionalLinks, plaintextLinks, url))
+  }
+  fieldsToProcess <- c("additionalLinks")
+  fieldsExist <- all(is.element(fieldsToProcess, names(dtD)))
+  if (fieldsExist) {
+    dtD <- dtD %>% 
+      mutate(additionalLinks = mapply(UpdateAdditionalLinks, additionalLinks, url))   
+  }
   
   # SECTION 8
   # Clean title, descriprion and plain text. Remove puntuation and stop words.
   # Prepare for the stem step
   stopWords <- readLines("stop_words.txt", warn = FALSE, encoding = "UTF-8")
+  
+  fieldsToProcess <- c("metaDescription")
+  fieldsExist <- all(is.element(fieldsToProcess, names(dtD)))
+  if (!fieldsExist) { dtD$metaDescription <- NA }
   
   dtD <- dtD %>% as.tbl() %>% mutate(stemTitle = tolower(metaTitle), 
                                      stemMetaDescription = tolower(metaDescription), 
@@ -187,29 +215,52 @@ TityData <- function(pagesToProcess) {
                                      stemMetaDescription = str_trim(stemMetaDescription, side = "both"), 
                                      stemPlaintext = str_trim(stemPlaintext, side = "both"))
   
-  StemText <- function(textToStem) {
-    res <- system("./mystem -cl", intern = TRUE, input = textToStem)
-    res <- gsub("[{}]", "", res)
-    res <- gsub("(\\|[^ ]+)", "", res)
-    res <- gsub("\\?", "", res)
-    res <- gsub("\\s+", " ", res)
-    return(res)
-  }
-  
   dtD <- dtD %>% as.tbl() %>% mutate(stemedTitle = mapply(StemText, stemTitle)) %>%
     mutate(stemedMetaDescription = mapply(StemText, stemMetaDescription)) %>%
-    mutate(stemedPlaintext = mapply(StemText, stemPlaintext))
+    mutate(stemedPlaintext = mapply(StemText, stemPlaintext)) %>%
+    select(-stemTitle, -stemMetaDescription, -stemPlaintext)
 
-  for (i in 1:nrow(dtD)) {
-    comments <- dtD$comments[i]
-    commentsDF <- StringToDF(comments)
-    
-    if (is.character(commentsDF)&&(commentsDF == "")) { next }
-    
-    commentsDF <- commentsDF %>% as.tbl() %>% mutate(stemedText = mapply(StemText, text))
-    dtD$comments[i] <- commentsDF %>% toJSON() %>% as.character()
-  }
+  # for (i in 1:nrow(dtD)) {
+  #   comments <- dtD$comments[i]
+  #   commentsDF <- StringToDF(comments)
+  #   
+  #   if (is.character(commentsDF)&&(commentsDF == "")) { next }
+  #   
+  #   commentsDF <- commentsDF %>% as.tbl() %>% mutate(stemedText = mapply(StemText, text))
+  #   dtD$comments[i] <- commentsDF %>% toJSON() %>% as.character()
+  # }
   
   return(dtD)  
 }
 
+TityDataComments <- function(comments) {
+  
+  # SECTION 1
+  # Create urlKey column as a key
+  dtD <- comments
+ 
+  dtD <- dtD %>% mutate(createdAt = ymd_hms(createdAt, tz = "Europe/Moscow", quiet = TRUE)) 
+  
+  stopWords <- readLines("stop_words.txt", warn = FALSE, encoding = "UTF-8")
+  
+  dtD <- dtD %>% as.tbl() %>% mutate(stemText = tolower(text)) %>% 
+    mutate(stemText = enc2utf8(stemText)) %>%
+    mutate(stemText = removeWords(stemText, stopWords)) %>% 
+    mutate(stemText = removePunctuation(stemText)) %>%
+    mutate(stemText = str_replace_all(stemText, "\\s+", " ")) %>%
+    mutate(stemText = str_trim(stemText, side = "both"))
+  
+  dtD$stemedText <- StemText(dtD$stemText)
+  dtD <- dtD %>% select(-stemText)
+  
+  return(dtD)  
+}
+
+StemText <- function(textToStem) {
+  res <- system("./mystem -cl", intern = TRUE, input = textToStem)
+  res <- gsub("[{}]", "", res)
+  res <- gsub("(\\|[^ ]+)", "", res)
+  res <- gsub("\\?", "", res)
+  res <- gsub("\\s+", " ", res)
+  return(res)
+}

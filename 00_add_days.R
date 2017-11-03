@@ -18,7 +18,8 @@ for (i in 1:length(dayArray)) {
                             "/", formatC(month(archiveDay), width = 2, format = "d", flag = "0"), 
                             "/", formatC(day(archiveDay), width = 2, format = "d", flag = "0"), 
                             "/") 
-  queryString <- paste0('{"link":"', link, '"}')
-  updateString <- paste0('{ "$set": {"link":"', link, '", "linkDate":"', format(archiveDay, "%Y%m%d"), '", "status":0, "updated_at":"', updated_at, '", "process":""} }')
+  queryString <- ListToQuery(list(link = link))
+  updateList <- list(link = link, linkDate = format(archiveDay, "%Y%m%d"), status = 0, updated_at = updated_at, process = "")
+  updateString <- ListToQuery(list('$set' = updateList)) 
   daytobeprocessed$update(queryString, update = updateString, upsert = TRUE)
 }

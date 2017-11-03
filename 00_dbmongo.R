@@ -2,6 +2,14 @@ require(mongolite, quietly = TRUE)
 require(jsonlite, quietly = TRUE)
 source("00_utils.R")
 
+SaveProblemLink <- function(link, problem) {
+  updated_at <- GetUpdatedAt()
+  queryString <- ListToQuery(list(link = link))
+  updateList <- list(link = link, updated_at = updated_at, problem = problem)
+  updateString <- ListToQuery(list('$set' = updateList))  
+  GetCollection("problems")$update(queryString, update = updateString, upsert = TRUE)
+}
+
 GetUpdatedAt <- function() {
   updated_at <- format(Sys.time(), "%Y%m%d%H%M%S %Z") 
 }

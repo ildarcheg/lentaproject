@@ -1,18 +1,18 @@
 source("00_dbmongo.R")
 
 crontabToAdd <- c()
-#crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 00; sar 1 5 > cpu_performance_temp.log; mv cpu_performance_temp.log cpu_performance.log # LENTA R SCRIPT')
-#crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 10; sar 1 5 > cpu_performance_temp.log; mv cpu_performance_temp.log cpu_performance.log # LENTA R SCRIPT')
-#crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 20; sar 1 5 > cpu_performance_temp.log; mv cpu_performance_temp.log cpu_performance.log # LENTA R SCRIPT')
-#crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 30; sar 1 5 > cpu_performance_temp.log; mv cpu_performance_temp.log cpu_performance.log # LENTA R SCRIPT')
-#crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 40; sar 1 5 > cpu_performance_temp.log; mv cpu_performance_temp.log cpu_performance.log # LENTA R SCRIPT')
-#crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 50; sar 1 5 > cpu_performance_temp.log; mv cpu_performance_temp.log cpu_performance.log # LENTA R SCRIPT')
-crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 00; Rscript 00_run_processes.R >> process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
-crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 10; Rscript 00_run_processes.R >> process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
-crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 20; Rscript 00_run_processes.R >> process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
-crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 30; Rscript 00_run_processes.R >> process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
-crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 40; Rscript 00_run_processes.R >> process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
-crontabToAdd <- c(crontabToAdd, '* *   * * *   cd /home/ildar/lentaproject/; sleep 50; Rscript 00_run_processes.R >> process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
+
+timer <- formatC(seq(0, 59, 10), width = 2, format = "d", flag = "0")
+for (i in 1:length(timer)) {
+  cron <- paste0('* *   * * *   cd /home/ildar/lentaproject/; sleep ', timer[i], '; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp.log > cpu.log; rm cpu_temp.log # LENTA R SCRIPT')
+  crontabToAdd <- c(crontabToAdd, cron)
+}
+
+timer <- formatC(seq(0, 59, 3), width = 2, format = "d", flag = "0")
+for (i in 1:length(timer)) {
+  cron <- paste0('* *   * * *   cd /home/ildar/lentaproject/; sleep ', timer[i], '; Rscript 00_run_processes.R >> process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
+  crontabToAdd <- c(crontabToAdd, cron)
+}
 
 #crontabToAdd <- c()
 crontab <- system('crontab -l', intern = TRUE)

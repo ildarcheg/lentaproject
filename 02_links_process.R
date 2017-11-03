@@ -25,38 +25,64 @@ updated_at <- GetUpdatedAt()
 print(paste0("updated_at: ", updated_at))
 
 for (i in 1:numberOfLinksToProcess) {
-  queryString <- paste0('{"status":0}')
-  updateString <- paste0('{ "$set": {"status":1, "process":"', process, '", "updated_at":"', updated_at, '"} }')
+  queryString <- ListToQuery(list(status = 0))
+  updateList <- list(status = 1, process = process, updated_at = updated_at)
+  updateString <- ListToQuery(list('$set' = updateList))   
   linksCollection$update(query = queryString, update = updateString, upsert = FALSE, multiple = FALSE)  
 }
 
-queryString <- paste0('{"process":"', process, '"}')
+queryString <- ListToQuery(list(process = process))
 linksToProcess <- linksCollection$find(queryString)
 
 for (i in 1:nrow(linksToProcess)) {
   link <- linksToProcess$link[i]
   archiveDay <- linksToProcess$linkDate[i]
   
+  print(paste0("link: ", link))
+  print(paste0("archiveDay: ", archiveDay))
+  
   if (is.null(link)) next
 
   if (nchar(link) < 20) {
-    queryString <- paste0('{"link":"', link, '"}')  
+    queryString <- ListToQuery(list(link = link))
     linksCollection$remove(queryString) 
     next
   }
-  pageDF <- ReadLink(link, archiveDay)
-  socialDF <- ReadSocial(link, archiveDay)
-  commentDF <- ReadComment(link, archiveDay)
   
-  updated_at <- GetUpdatedAt()
-  pageDF <- cbind(link = link, linkDate = archiveDay, status = 0, updated_at = updated_at, process = "", pageDF, socialDF, commentDF, stringsAsFactors = FALSE)
-  queryString <- paste0('{"link":"', link, '"}')
+  pageDF <- tryCatch(ReadLink(link, archiveDay), error = function(x) {data.frame()}) 
+  if (nrow(pageDF)==0) {
+    errorText <- paste0("'parsing: parsing error - ", link, "'")
+    print(errorText)
+    system(paste0("echo ", errorText, " >> error.log"), intern = FALSE)
+    SaveProblemLink(link, errorText)
+    updated_at <- GetUpdatedAt()
+    queryString <- ListToQuery(list(link = link))
+  } else if (is.na(pageDF$url[1])) {
+    errorText <- paste0("'parssysteming: empty link - ", link, "'")
+    print(errorText)
+    system(paste0("echo ", errorText, " >> error.log"), intern = FALSE)
+    SaveProblemLink(link, errorText)
+    updated_at <- GetUpdatedAt()
+    queryString <- ListToQuery(list(link = link))
+  } else if (is.na(pageDF$plaintext[1])) {
+    errorText <- paste0("'parsing: empty text - ", link, "'")
+    print(errorText)
+    system(paste0("echo ", errorText, " >> error.log"), intern = FALSE)
+    SaveProblemLink(link, errorText)
+    updated_at <- GetUpdatedAt()
+    queryString <- ListToQuery(list(link = link))
+  } else {
+    socialDF <- ReadSocial(link, archiveDay)
+    commentDF <- ReadComment(link, archiveDay)
+    updated_at <- GetUpdatedAt()
+    queryString <- ListToQuery(list(link = link))
+    updateList <- list(link = link, linkDate = archiveDay, status = 0, updated_at = updated_at, process = "", page = pageDF, social = socialDF, comments = commentDF)
+    updateString <- ListToQuery(list('$set' = updateList))  
+    pagesCollection$update(queryString, update = updateString, upsert = TRUE)
+  }
   
-  pageJSON <- toJSON(pageDF)
-  updateString <- gsub("\\[|\\]", "", pageJSON)  
-
-  pagesCollection$update(queryString, update = updateString, upsert = TRUE)
-  updateString <- paste0('{ "$set": {"status":2, "process":"", "updated_at":"', updated_at, '"} }')
+  updateList <- list(status = 2, process = "", updated_at = updated_at)
+  updateString <- ListToQuery(list('$set' = updateList)) 
   linksCollection$update(queryString, update = updateString, upsert = TRUE)
 }
 

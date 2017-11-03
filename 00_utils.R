@@ -27,7 +27,7 @@ GetCPULoad <- function() {
 }
 
 GetCPULoadFromLog <- function() {
-  cpu <- system("cat cpu_performance.log", intern = TRUE)[9] %>% stripWhitespace %>% str_split(" ")
+  cpu <- system("cat cpu.log", intern = TRUE)[9] %>% stripWhitespace %>% str_split(" ")
   cpu <- cpu[[1]][3]
   cpu <- as.numeric(cpu)
   return(cpu)
@@ -39,32 +39,38 @@ GetDBStatus <- function() {
                      status1=as.integer(), 
                      status2=as.integer(),
                      lastUpdate=as.character(),
-                     sizeMb=as.character(),
+                     sizeKb=as.character(),
+                     avgObjSizeKb=as.character(),
                      processes=as.integer())
   collections <- DefCollections()
   
   for (i in 1:length(collections)) {
     collection <- GetCollection(collections[i])
     df <- collection$find(fields = '{"status" : true, "updated_at" : true, "_id": false}')
-    
+    df$updated_at <- unlist(df$updated_at, use.names = FALSE)
     total <- df %>% nrow()
     status0 <- df %>% filter(status==0) %>% nrow()
     status1 <- df %>% filter(status==1) %>% nrow()
     status2 <- df %>% filter(status==2) %>% nrow()
-    lastUpdate <- df %>% summarise(up=max(updated_at)) %>% unlist(use.names = FALSE)
-    commandSize <- paste0("mongo lenta --eval 'db.", collections[i], ".totalSize()'")
-    sizeByte <- as.integer(system(commandSize, intern = TRUE)[4])
-    sizeMb <- format(structure(sizeByte, class="object_size"), units="Kb")
+    #lastUpdate <- df %>% as.tbl() %>% summarise(up=max(updated_at)) %>% unlist(use.names = FALSE)
+    #commandSize <- paste0("mongo lenta --eval 'db.", collections[i], ".totalSize()'")
+    #sizeByte <- as.integer(system(commandSize, intern = TRUE)[4])
+    collInfo <- collection$info()
+    sizeKb <- format(structure(collInfo$stats$size, class="object_size"), units="Kb")
+    avgO <- collInfo$stats$avgObjSize
+    avgO[is.null(avgO)] <- 0
+    avgObjSizeKb <- format(structure(avgO, class="object_size"), units="Kb")
     processes <- length(GetCollection(collections[i])$distinct("process"))-1
-    if (is.null(lastUpdate)) { lastUpdate <- "" }
+    #if (is.null(lastUpdate)) { lastUpdate <- "" }
     dfStatus <- add_row(dfStatus, 
                         coll=collections[i],
                         total=total,
                         status0=status0,
                         status1=status1,
                         status2=status2,
-                        lastUpdate=lastUpdate,
-                        sizeMb=sizeMb,
+                        lastUpdate="",
+                        sizeKb=sizeKb,
+                        avgObjSizeKb=avgObjSizeKb,
                         processes=processes)
   }
   dfStatus
@@ -75,16 +81,16 @@ GetPerformance <- function() {
                      PID=as.character(), 
                      cpu=as.integer(), 
                      memory=as.integer())  
+  command <- paste0('ps aux') 
+  oldw <- getOption("warn")
+  options(warn = -1)
+  result <- system(command, intern = TRUE) 
+  options(warn = oldw)
+  
   scripts <- DefScripts()
   for (i in 1:length(scripts)) {
     script <- scripts[i]
-    command <- paste0('ps aux | grep -v grep | grep "', script, '"') 
-    
-    oldw <- getOption("warn")
-    options(warn = -1)
-    res <- system(command, intern = TRUE) 
-    options(warn = oldw)
-    
+    res <- grep(script, result, value=TRUE)
     if (length(res)==0) next
     res <- stripWhitespace(res)
     for (k in 1:length(res)) {
@@ -117,30 +123,7 @@ toJsonString <- function(dt) {
   return(values)
 }
 
-DFToString <- function(df) {
-  if (nrow(df) == 0) {
-    return("")
-  }
-  
-  rows <- c(paste0(names(df), collapse = "-tab0tab-"))
-  for (i in 1:nrow(df)) {
-    rowText <- c()
-    for (k in 1:length(names(df))) {
-      rowText <- c(rowText, as.character(df[i,k])) 
-    }
-    rowText <- paste0(rowText, collapse = "-tab0tab-")
-    rows <- c(rows, rowText)
-  }
-  stringFromDF <- paste0(rows, collapse = "-tab7tab-")  
-  return(stringFromDF)
-}
-
-StringToDF <- function(string) {
-  if (string == "") {
-    return(data.frame())
-  }
-  rows <- str_split(string, "-tab7tab-", simplify = TRUE)
-  dfNames <- str_split(rows[1], "-tab0tab-", simplify = TRUE)
-  df <- setNames(data.frame(str_split(rows[2:length(rows)], "-tab0tab-", simplify = TRUE)), dfNames)
-  return(df)
+ListToQuery <- function(listToConvert) {
+  query <- listToConvert %>% toJSON() %>% str_replace_all("\\[(?!\\{)|(?<!\\})\\]", "")
+  return(query)
 }

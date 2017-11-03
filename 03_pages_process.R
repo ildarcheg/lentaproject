@@ -17,28 +17,47 @@ process <- paste0(runif(1, 1, 10), runif(1, 1, 10), collapse = "")
 updated_at <- GetUpdatedAt()
 
 for (i in 1:numberOfPagesToProcess) {
-  queryString <- paste0('{"status":0}')
-  updateString <- paste0('{ "$set": {"status":1, "process":"', process, '", "updated_at":"', updated_at, '"} }')
+  queryString <- ListToQuery(list(status = 0))
+  updateList <- list(status = 1, process = process, updated_at = updated_at)
+  updateString <- ListToQuery(list('$set' = updateList))     
   pagesCollection$update(query = queryString, update = updateString, upsert = FALSE, multiple = FALSE)  
 }
 
-queryString <- paste0('{"process":"', process, '"}')
-pagesToProcess <- pagesCollection$find(queryString)
+queryString <- ListToQuery(list(process = process))
+pagesToProcessD <- pagesCollection$find(queryString)
 
-pagesToProcessD <- TityData(pagesToProcess)
+print(paste0("Rows to process: ", nrow(pagesToProcessD)))
 
 for (i in 1:nrow(pagesToProcessD)) {
+  
   link <- pagesToProcessD$link[i]
+  
+  if (is.null(link)) next
+  
   archiveDay <- pagesToProcessD$linkDate[i]
   
+  print(paste0("link: ", link))
+  print(paste0("archiveDay: ", archiveDay))
+  
+  pageDF <- pagesToProcessD$page[i][[1]]
+  pageDF$dateToUse <- archiveDay 
+  pageDF <- TityData(pageDF)
+  
+  socialDF <- pagesToProcessD$social[i][[1]]
+  
+  commentDF <- pagesToProcessD$comments[i][[1]]
+  if (!is.null(commentDF)&!is.na(commentDF)) {
+    commentDF <- TityDataComments(commentDF)
+  }
   updated_at <- GetUpdatedAt()
-  pagesToProcessD[i, ]$status <- 0
-  queryString <- paste0('{"link":"', link, '"}')
-  pageJSON <- toJSON(pagesToProcessD[i, ])
-  updateString <- gsub("\\[|\\]", "", pageJSON)  
+  queryString <- ListToQuery(list(link = link))
+  updateList <- list(link = link, linkDate = archiveDay, status = 0, updated_at = updated_at, process = "", page = pageDF, social = socialDF, comments = commentDF)
+  updateString <- ListToQuery(list('$set' = updateList))  
+  
   articlesCollection$update(queryString, update = updateString, upsert = TRUE)
   
-  updateString <- paste0('{ "$set": {"status":2, "process":"", "updated_at":"', updated_at, '"} }')
+  updateList <- list(status = 2, process = "", updated_at = updated_at)
+  updateString <- ListToQuery(list('$set' = updateList)) 
   pagesCollection$update(queryString, update = updateString, upsert = TRUE)  
 }
 

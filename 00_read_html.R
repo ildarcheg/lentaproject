@@ -30,32 +30,42 @@ ReadSocial <- function(link, archiveDay) {
 }
 
 ReadComment <- function(link, archiveDay) {
+  
+  comments <- NA
+  
   linkEncode <- URLencode(link , reserved = TRUE)
   linkToRead <- paste0("https://c.rambler.ru/api/app/126/widget/init/?appId=126&xid=", 
                        linkEncode)
   pg <- read_html(linkToRead, encoding = "UTF-8")
-  jsonReply <- pg %>% html_text() %>% fromJSON() 
+  textToJSON <- html_nodes(pg, xpath=".//p") %>% html_text()
+  valid <- validate(textToJSON)[[1]]
+  if (valid == FALSE) {
+    return(comments)
+  }
   
-  if (is.null(jsonReply$comments)) { 
-    comments <- data.frame()
+  jsonReply <- html_nodes(pg, xpath=".//p") %>% html_text() %>% fromJSON() 
+  
+  columnsToKeep <- c("id", 
+                     "hasLink", 
+                     "hasGreyWord", 
+                     "text", 
+                     "moderation", 
+                     "rating", 
+                     "createdAt", 
+                     "parentId", 
+                     "sessionSourceIcon", 
+                     "userId", 
+                     "userpic", 
+                     "displayName", 
+                     "username",
+                     "level",
+                     "childrenCount",
+                     "hasChild")
+  
+  if (is.null(jsonReply$comments)|(length(jsonReply$comments0)==0)) { 
+    return(comments)
   } else {
     columnNames <- names(jsonReply$comments)
-    columnsToKeep <- c("id", 
-                       "hasLink", 
-                       "hasGreyWord", 
-                       "text", 
-                       "moderation", 
-                       "rating", 
-                       "createdAt", 
-                       "parentId", 
-                       "sessionSourceIcon", 
-                       "userId", 
-                       "userpic", 
-                       "displayName", 
-                       "username",
-                       "level",
-                       "childrenCount",
-                       "hasChild")
     columns <- intersect(columnNames, columnsToKeep)
     comments <- jsonReply$comments %>% select(columns) 
     comments <- as.data.frame(comments)
@@ -92,28 +102,47 @@ ReadLink <- function(link, archiveDay) {
   } else {
     chapters <- scriptContent[grep("chapters: ", scriptContent)] %>% unique()
   }
-  
+
   articleBodyNode <- html_nodes(pg, xpath=".//div[@itemprop='articleBody']")
-  
-  # Extract articles body
-  plaintext <- html_nodes(articleBodyNode, xpath=".//p") %>% 
-    html_text() %>% 
-    paste0(collapse="") 
-  if (plaintext == "") {
-    plaintext <- NA
+  if (length(articleBodyNode) == 0) {
+    articleBodyNode <- html_nodes(pg, xpath=".//div[@class='b-numeric-card-box__title']|.//div[@class='b-numeric-card-box__description']")  
+    # Extract articles body
+    plaintext <- articleBodyNode %>% 
+      html_text() %>% 
+      paste0(collapse=" ") 
+    if (plaintext == "") {
+      plaintext <- NA
+    }
+    
+    # Extract links from articles body 
+    plaintextLinks <- html_nodes(articleBodyNode, xpath=".//a") %>% 
+      html_attr("href") %>% 
+      unique() %>% 
+      paste0(collapse=" ") %>%
+      SetNAIfZeroLength()
+    if (plaintextLinks == "") {
+      plaintextLinks <- NA
+    }
+  } else {
+    # Extract articles body
+    plaintext <- html_nodes(articleBodyNode, xpath=".//p") %>% 
+      html_text() %>% 
+      paste0(collapse=" ") 
+    if (plaintext == "") {
+      plaintext <- NA
+    }
+    
+    # Extract links from articles body 
+    plaintextLinks <- html_nodes(articleBodyNode, xpath=".//a") %>% 
+      html_attr("href") %>% 
+      unique() %>% 
+      paste0(collapse=" ") %>%
+      SetNAIfZeroLength()
+    if (plaintextLinks == "") {
+      plaintextLinks <- NA
+    }
   }
-  
-  
-  # Extract links from articles body 
-  plaintextLinks <- html_nodes(articleBodyNode, xpath=".//a") %>% 
-    html_attr("href") %>% 
-    unique() %>% 
-    paste0(collapse=" ") %>%
-    SetNAIfZeroLength()
-  if (plaintextLinks == "") {
-    plaintextLinks <- NA
-  }
-  
+
   # Extract links related to articles
   additionalLinks <- html_nodes(pg, xpath=".//section/div[@class='item']/div/..//a") %>% 
     html_attr("href") %>% 
@@ -168,7 +197,7 @@ ReadLink <- function(link, archiveDay) {
   if (length(authorLinks) > 1) {
     authorLinks <- paste0(authorLinks, collapse = "|")
   }
-  
+
   # Extract publish date and time
   datetimeString <- html_nodes(pg, xpath=".//div[@class='b-topic__info']/time[@class='g-date']") %>% 
     html_text() %>% 
@@ -182,7 +211,7 @@ ReadLink <- function(link, archiveDay) {
       unique() %>% 
       SetNAIfZeroLength()
   }
-  
+
   data.frame(url = url,
              metaTitle= metaTitle,
              metaType= metaType,
