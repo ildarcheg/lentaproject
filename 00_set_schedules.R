@@ -10,7 +10,7 @@ for (i in 1:length(timer)) {
 
 timer <- formatC(seq(0, 59, 3), width = 2, format = "d", flag = "0")
 for (i in 1:length(timer)) {
-  cron <- paste0('* *   * * *   cd /home/ildar/lentaproject/; sleep ', timer[i], '; Rscript 00_run_processes.R >> process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
+  cron <- paste0('* *   * * *   cd /home/ildar/lentaproject/; sleep ', timer[i], '; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
   crontabToAdd <- c(crontabToAdd, cron)
 }
 

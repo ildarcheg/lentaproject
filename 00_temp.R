@@ -1,7 +1,7 @@
 source("00_dbmongo.R")
 
 
-commandArgs <- function() c(as.Date(Sys.time())-30, as.Date(Sys.time()))
+commandArgs <- function() c(as.Date(Sys.time())-365, as.Date(Sys.time()))
 source('00_add_days.R')
 
 commandArgs <- function() c("1999-09-01", "2001-12-31")
@@ -91,3 +91,14 @@ res
 
 #dayscollection$find('{ "$or": [ { "b": 6 }, { "c": 10 } ] }')
 #dayscollection$find('{ "b": { "$in" : [ 6, 8, 10]  } }')
+
+
+dfText <- system("mongo --quiet < dbquery.js", intern = TRUE)
+dfNames <- c("collection", "total", "status0", "status1", "status2", "processes", "Mb")
+dfList <- dfText[(which(dfText=="----------")+1):length(dfText)] %>% str_split("\t") 
+df <- as.data.frame(do.call(rbind, dfList)) %>% setNames(dfNames)
+
+
+for (i in 1:50) {
+system("Rscript 02_links_process.R", wait=FALSE, ignore.stdout = TRUE, ignore.stderr = TRUE)
+}

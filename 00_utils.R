@@ -1,8 +1,3 @@
-require(tibble, quietly = TRUE)
-require(dplyr, quietly = TRUE, warn.conflicts = FALSE)
-require(tm, quietly = TRUE)
-require(stringr, quietly = TRUE)
-
 DefCollections <- function() {
   collections <- c("c01_daytobeprocessed", 
                    "c02_linkstobeprocessed", 
@@ -20,15 +15,21 @@ DefScripts <- function() {
 }
 
 GetCPULoad <- function() {
-  cpu <- system("sar 1 5", intern = TRUE)[9] %>% stripWhitespace %>% str_split(" ")
-  cpu <- cpu[[1]][3]
+  cpu <- system("sar 1 5", intern = TRUE)[9]
+  cpu <- strsplit(cpu, " ")
+  cpu <- unlist(cpu, use.names = FALSE)
+  cpu <- cpu[cpu!=""]
+  cpu <- cpu[3]
   cpu <- as.numeric(cpu)
   return(cpu)
 }
 
 GetCPULoadFromLog <- function() {
-  cpu <- system("cat cpu.log", intern = TRUE)[9] %>% stripWhitespace %>% str_split(" ")
-  cpu <- cpu[[1]][3]
+  cpu <- system("cat cpu.log", intern = TRUE)[9]
+  cpu <- strsplit(cpu, " ")
+  cpu <- unlist(cpu, use.names = FALSE)
+  cpu <- cpu[cpu!=""]
+  cpu <- cpu[3]
   cpu <- as.numeric(cpu)
   return(cpu)
 }
@@ -76,11 +77,21 @@ GetDBStatus <- function() {
   dfStatus
 }
 
+GetDBStatusCLI <- function() {
+  dfText <- system("mongo --quiet < dbquery.js", intern = TRUE)
+  dfNames <- c("coll", "total", "status0", "status1", "status2", "processes", "Mb")
+  dfText <- dfText[(which(dfText=="----------")+1):length(dfText)]
+  dfList <- strsplit(dfText, "\t")
+  dfStatus <- as.data.frame(do.call(rbind, dfList), stringsAsFactors = FALSE)
+  names(dfStatus) <- dfNames
+  dfStatus
+}
+
 GetPerformance <- function() {
   dfPerformance <- tibble(script=as.character(), 
-                     PID=as.character(), 
-                     cpu=as.integer(), 
-                     memory=as.integer())  
+                          PID=as.character(), 
+                          cpu=as.integer(), 
+                          memory=as.integer())  
   command <- paste0('ps aux') 
   oldw <- getOption("warn")
   options(warn = -1)
@@ -105,25 +116,32 @@ GetPerformance <- function() {
   dfPerformance  
 }
 
-toJsonString <- function(dt) {
-  if (nrow(dt) !=1) {
-    return('{}')
-  } else {
-    values <- c()
-    columns <- names(dt)
-    for (i in 1:length(columns)) {
-      columnName <- columns[i]
-      value <- dt[1, columnName]
-      if (!is.integer(value)&&!is.numeric(value)) { value <- paste0('"', value,'"') }
-      values <- c(values, paste0('"', columnName,'":',value))  
+GetPerformanceCLI <- function() {
+  command <- paste0('ps aux') 
+  oldw <- getOption("warn")
+  options(warn = -1)
+  result <- system(command, intern = TRUE) 
+  options(warn = oldw)
+  cpuList <- list()
+  cpuN <- 0
+  scripts <- DefScripts()
+  for (i in 1:length(scripts)) {
+    script <- scripts[i]
+    res <- grep(script, result, value=TRUE)
+    if (length(res)==0) next
+    for (k in 1:length(res)) {
+      cpuInfo <- res[k]
+      cpuInfo <- strsplit(cpuInfo, " ")
+      cpuInfo <- unlist(cpuInfo, use.names = FALSE)
+      cpuInfo <- cpuInfo[cpuInfo!=""]
+      cpu <- list(script=script,
+                  PID=cpuInfo[2],
+                  cpu=as.numeric(cpuInfo[3]),
+                  memory=as.numeric(cpuInfo[4]))
+      cpuN <- cpuN + 1
+      cpuList[[cpuN]] <- cpu
     }
-  } 
-  values <- paste0(values, collapse = ",")
-  values <- paste0("{", values, "}")
-  return(values)
-}
-
-ListToQuery <- function(listToConvert) {
-  query <- listToConvert %>% toJSON() %>% str_replace_all("\\[(?!\\{)|(?<!\\})\\]", "")
-  return(query)
+  }
+  dfPerformance <- as.data.frame(do.call(rbind, cpuList), stringsAsFactors = FALSE)
+  dfPerformance
 }

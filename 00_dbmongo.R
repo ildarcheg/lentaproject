@@ -1,5 +1,11 @@
 require(mongolite, quietly = TRUE)
 require(jsonlite, quietly = TRUE)
+require(tibble, quietly = TRUE)
+require(dplyr, quietly = TRUE, warn.conflicts = FALSE)
+require(tm, quietly = TRUE)
+require(stringr, quietly = TRUE)
+require(lubridate, quietly = TRUE)
+
 source("00_utils.R")
 
 SaveProblemLink <- function(link, problem) {
@@ -13,6 +19,8 @@ SaveProblemLink <- function(link, problem) {
 GetUpdatedAt <- function() {
   updated_at <- format(Sys.time(), "%Y%m%d%H%M%S %Z") 
 }
+
+
 GetCollection <- function(collectionName) {
   collection <- mongo(collection = collectionName, db = "lenta", url = "mongodb://localhost")
   return(collection)
@@ -38,4 +46,10 @@ SetDefaultValue <- function(key, value) {
   defaultsCollection$update(query, update = updateString, upsert = TRUE)
 }
 
+ListToQuery <- function(listToConvert) {
+  query <- listToConvert %>% toJSON() %>% str_replace_all("\\[(?!\\{)|(?<!\\})\\]", "")
+  return(query)
+}
+
 defaultsCollection <- GetCollection("c00_defaults")
+problemsCollection <- GetCollection("problems")
