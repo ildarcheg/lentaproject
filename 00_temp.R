@@ -1,10 +1,10 @@
 source("00_dbmongo.R")
 
 
-commandArgs <- function() c(as.Date(Sys.time())-365, as.Date(Sys.time()))
+#commandArgs <- function() c(as.Date(Sys.time())-365, as.Date(Sys.time())-360)
 source('00_add_days.R')
 
-commandArgs <- function() c("1999-09-01", "2001-12-31")
+commandArgs <- function() c("1999-09-01", "2010-01-01")
 source('00_add_days.R')
 
 commandArgs <- function() c("1999-09-01", "1999-09-07")
@@ -19,6 +19,10 @@ source('02_links_process.R')
 commandArgs <- function() c(10)
 source('03_pages_process.R')
 
+updated_at <- GetUpdatedAt()
+queryString <- paste0('{"status":1}')
+updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
+GetCollection(DefCollections()[1])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE)
 
 updated_at <- GetUpdatedAt()
 updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
