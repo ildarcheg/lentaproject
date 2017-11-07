@@ -8,10 +8,10 @@ require(lubridate, quietly = TRUE)
 
 source("00_utils.R")
 
-SaveProblemLink <- function(link, problem) {
+SaveProblemLink <- function(link, archiveDay, problem) {
   updated_at <- GetUpdatedAt()
   queryString <- ListToQuery(list(link = link))
-  updateList <- list(link = link, updated_at = updated_at, problem = problem)
+  updateList <- list(link = link, linkDate = archiveDay, updated_at = updated_at, problem = problem)
   updateString <- ListToQuery(list('$set' = updateList))  
   GetCollection("problems")$update(queryString, update = updateString, upsert = TRUE)
 }

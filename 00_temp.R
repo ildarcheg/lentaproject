@@ -1,10 +1,10 @@
 source("00_dbmongo.R")
 
 
-commandArgs <- function() c(as.Date(Sys.time())-365, as.Date(Sys.time()))
+#commandArgs <- function() c(as.Date(Sys.time())-5, as.Date(Sys.time()))
 source('00_add_days.R')
 
-commandArgs <- function() c("1999-09-01", "2001-12-31")
+commandArgs <- function() c("1999-09-01", "2010-01-01")
 source('00_add_days.R')
 
 commandArgs <- function() c("1999-09-01", "1999-09-07")
@@ -19,6 +19,10 @@ source('02_links_process.R')
 commandArgs <- function() c(10)
 source('03_pages_process.R')
 
+updated_at <- GetUpdatedAt()
+queryString <- paste0('{"status":1}')
+updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
+GetCollection(DefCollections()[1])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE)
 
 updated_at <- GetUpdatedAt()
 updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
@@ -101,4 +105,35 @@ df <- as.data.frame(do.call(rbind, dfList)) %>% setNames(dfNames)
 
 for (i in 1:50) {
 system("Rscript 02_links_process.R", wait=FALSE, ignore.stdout = TRUE, ignore.stderr = TRUE)
+}
+
+
+df <- problemsCollection$find()
+linksCollection <- GetCollection(DefCollections()[2])
+
+for (i in 1:nrow(df)) {
+  link <- df$link[i]
+  queryString <- ListToQuery(list(link = link))
+  dt <- linksCollection$find(queryString)
+  linkDate <- dt$linkDate[1]
+  print(paste0(linkDate, " ", link))
+  updateList <- list(link = link, linkDate = dt$linkDate[1])
+  updateString <- ListToQuery(list('$set' = updateList))  
+  print(updateString)
+  problemsCollection$update(queryString, update = updateString, upsert = FALSE)
+}
+
+df <- problemsCollection$find()
+linksCollection <- GetCollection(DefCollections()[2])
+
+for (i in 1:nrow(df)) {
+  link <- df$link[i]
+  queryString <- ListToQuery(list(link = link))
+  dt <- linksCollection$find(queryString)
+  linkDate <- dt$linkDate[1]
+  print(paste0(linkDate, " ", link))
+  updateList <- list(link = link, linkDate = dt$linkDate[1])
+  updateString <- ListToQuery(list('$set' = updateList))  
+  print(updateString)
+  problemsCollection$update(queryString, update = updateString, upsert = FALSE)
 }

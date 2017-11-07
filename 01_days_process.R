@@ -28,7 +28,6 @@ daysToProcess <- daysCollection$find(queryString)
 for (i in 1:nrow(daysToProcess)) {
   linkArchivePage <- daysToProcess$link[i]
   archiveDay <- daysToProcess$linkDate[i]
-  
   if (is.null(linkArchivePage)) next
   pg <- read_html(linkArchivePage, encoding = "UTF-8")
   linksOnPage <- html_nodes(pg, 
@@ -36,18 +35,19 @@ for (i in 1:nrow(daysToProcess)) {
     html_attr("href") 
   
   updated_at <- GetUpdatedAt()
-  for (k in 1:length(linksOnPage)) {
-    link <- linksOnPage[k]
-    
-    if (is.null(link)|is.na(link)) next
-    if (nchar(link) < 20) next
-    
-    link <- paste0(baseURL, link)
-    
-    queryString <- ListToQuery(list(link = link))
-    updateList <- list(link = link, linkDate = archiveDay, status = 0, updated_at = updated_at, process = "")
-    updateString <- ListToQuery(list('$set' = updateList)) 
-    linksCollection$update(queryString, update = updateString, upsert = TRUE)
+  if (length(linksOnPage)!=0) {
+    for (k in 1:length(linksOnPage)) {
+      link <- linksOnPage[k]
+      if (is.null(link)|is.na(link)) next
+      if (nchar(link) < 20) next
+      
+      link <- paste0(baseURL, link)
+      
+      queryString <- ListToQuery(list(link = link))
+      updateList <- list(link = link, linkDate = archiveDay, status = 0, updated_at = updated_at, process = "")
+      updateString <- ListToQuery(list('$set' = updateList)) 
+      linksCollection$update(queryString, update = updateString, upsert = TRUE)
+    }
   }
   queryString <- ListToQuery(list(link = linkArchivePage))
   updateList <- list(status = 2, process = "", updated_at = updated_at)

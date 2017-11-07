@@ -16,10 +16,10 @@ ReadSocial <- function(link, archiveDay) {
   linkToReadVK <- paste0("https://vk.com/share.php?act=count&index=1&url=", linkEncode, "&format=json")
   linkToReadOK <- paste0("https://connect.ok.ru/dk?st.cmd=extLike&uid=okLenta&ref=", linkEncode, "")
   linkToReadCom <- paste0("https://c.rambler.ru/api/app/126/comments-count?xid=", linkEncode, "")
-  FB <- read_html(linkToReadFB) %>% html_text() %>% fromJSON()
-  if (length(FB) == 0) { FB <- 0 } else { FB <- FB[[1]]$engagement$share_count }
-  VK <- read_html(linkToReadVK) %>% html_text() %>% str_replace_all(" |.*\\,|\\);", "") %>% as.integer()
-  OK <- read_html(linkToReadOK) %>% html_text() %>% str_replace_all(" |.*\\,|\\);|'", "") %>% as.integer()
+  FB <- tryCatch(read_html(linkToReadFB) %>% html_text() %>% fromJSON(), error = function(x) {NA})
+  if ((length(FB) == 0)|is.na(FB)) { FB <- 0 } else { FB <- FB[[1]]$engagement$share_count }
+  VK <- tryCatch(read_html(linkToReadVK) %>% html_text() %>% str_replace_all(" |.*\\,|\\);", "") %>% as.integer(), error = function(x) {0})
+  OK <-  tryCatch(read_html(linkToReadOK) %>% html_text() %>% str_replace_all(" |.*\\,|\\);|'", "") %>% as.integer(), error = function(x) {0})
   Com <- read_html(linkToReadCom) %>% html_text() %>% fromJSON()
   if (length(Com$xids) == 0) { Com <- 0 } else { Com <- Com$xids[[1]] }
   data.frame(FB = FB,
