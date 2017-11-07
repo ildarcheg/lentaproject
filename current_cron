@@ -46,4 +46,4 @@
 * *   * * *   cd /home/ildar/lentaproject/; sleep 51; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
 * *   * * *   cd /home/ildar/lentaproject/; sleep 54; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
 * *   * * *   cd /home/ildar/lentaproject/; sleep 57; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-1 * * * *   cd /home/ildar/lentaproject/; Rscript 00_back_to_stage.R # LENTA R SCRIPT
+1,30 * * * *   cd /home/ildar/lentaproject/; Rscript 00_back_to_stage.R # LENTA R SCRIPT

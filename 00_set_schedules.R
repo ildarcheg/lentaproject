@@ -14,7 +14,7 @@ for (i in 1:length(timer)) {
   crontabToAdd <- c(crontabToAdd, cron)
 }
 
-cron <- paste0('1 * * * *   cd /home/ildar/lentaproject/; Rscript 00_back_to_stage.R # LENTA R SCRIPT')
+cron <- paste0('1,30 * * * *   cd /home/ildar/lentaproject/; Rscript 00_back_to_stage.R # LENTA R SCRIPT')
 crontabToAdd <- c(crontabToAdd, cron)
 
 #crontabToAdd <- c()
