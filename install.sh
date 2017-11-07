@@ -86,6 +86,17 @@ sudo setfacl -m u:ildar:rwx /etc/crontab
 sudo setfacl -x u:ildar /etc/crontab
 sudo getfacl /etc/crontab 
 
+sudo apt-get install sysstat
+sudo vi /etc/default/sysstat 		# set enable=true
+sudo nano /etc/cron.d/sysstat 
+
+#PATH=/usr/lib/sysstat:/usr/sbin:/usr/sbin:/usr/bin:/sbin:/bin
+## Activity reports every 10 minutes everyday
+#* * * * * root command -v debian-sa1 > /dev/null && debian-sa1 1 1
+## Additional run at 23:59 to rotate the statistics file
+#59 23 * * * root command -v debian-sa1 > /dev/null && debian-sa1 60 2
+sudo service sysstat restart
+
 # sudo echo '/usr/sbin/ufw enable' | sudo tee /etc/rc.local
 
 sudo echo 'install.packages("memoise")' | sudo tee install_packages.R
