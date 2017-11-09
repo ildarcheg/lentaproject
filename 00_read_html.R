@@ -62,7 +62,7 @@ ReadComment <- function(link, archiveDay) {
                      "childrenCount",
                      "hasChild")
   
-  if (is.null(jsonReply$comments)|(length(jsonReply$comments0)==0)) { 
+  if (is.null(jsonReply$comments)|(length(jsonReply$comments)==0)) { 
     return(comments)
   } else {
     columnNames <- names(jsonReply$comments)

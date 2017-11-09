@@ -1,5 +1,5 @@
 source("00_dbmongo.R")
-
+x <- 1f0
 
 #commandArgs <- function() c(as.Date(Sys.time())-5, as.Date(Sys.time()))
 source('00_add_days.R')
@@ -136,4 +136,43 @@ for (i in 1:nrow(df)) {
   updateString <- ListToQuery(list('$set' = updateList))  
   print(updateString)
   problemsCollection$update(queryString, update = updateString, upsert = FALSE)
+}
+
+
+
+
+
+source("00_dbmongo.R")
+df <- historyCollection$find()
+links <- unique(df$link)
+changesList <- list()
+numberOfChanges <- 0
+for (i in 1:length(links)) {
+  dfl <- df %>% filter(link == links[i]) %>% arrange(historyTime)
+  print("--------")
+  print(i)
+  print(nrow(dfl))
+  print(links[i])
+  print(links[i])
+  print(dfl$historyTime)
+  if (nrow(dfl) >= 2) {
+    for (k in (2:nrow(dfl))) {
+      x1 <- dfl$page[k-1][[1]]$plaintext[1] %>% strsplit(" ") %>% unlist(use.names = FALSE)
+      x2 <- dfl$page[k][[1]]$plaintext[1] %>% strsplit(" ") %>% unlist(use.names = FALSE)
+      diffBefore <- setdiff(x1, x2)
+      diffAfter <- setdiff(x2, x1)
+      x1stemed <- dfl$page[k-1][[1]]$stemedPlaintext[1] %>% strsplit(" ") %>% unlist(use.names = FALSE)
+      x2stemed <- dfl$page[k][[1]]$stemedPlaintext[1] %>% strsplit(" ") %>% unlist(use.names = FALSE)  
+      diffBeforeStemed <- setdiff(x1stemed, x2stemed)
+      diffAfterStemed <- setdiff(x2stemed, x1stemed)    
+      if ((length(diffBefore) > 0)|(length(diffAfter) > 0)|(length(diffBeforeStemed) > 0)|(length(diffAfterStemed) > 0)) {
+        numberOfChanges <- numberOfChanges + 1
+        changesList[[numberOfChanges]] <- data.frame(link = links[i], linkDate = dfl$linkDate[k], changeDate = dfl$historyTime[k], 
+                                                     diffBefore = paste0(diffBefore, collapse = " "), diffAfter = paste0(diffAfter, collapse = " "),
+                                                     diffBeforeStemed = paste0(diffBeforeStemed, collapse = " "), diffAfterStemed = paste0(diffAfterStemed, collapse = " "))
+      }
+    }
+  }
+
+  
 }
