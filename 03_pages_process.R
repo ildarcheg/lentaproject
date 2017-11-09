@@ -56,6 +56,14 @@ for (i in 1:nrow(pagesToProcessD)) {
   
   articlesCollection$update(queryString, update = updateString, upsert = TRUE)
   
+  isLastWeek <- (ymd(archiveDay) >= (as.Date(Sys.time()) - 3))
+  if (isLastWeek == TRUE) {
+    queryStringLastWeek <- ListToQuery(list(link = link, historyTime = updated_at))
+    updateListLastWeek <- list(link = link, linkDate = archiveDay, historyTime = updated_at, updated_at = updated_at, process = "", page = pageDF, social = socialDF, comments = commentDF)
+    updateStringLastWeek <- ListToQuery(list('$set' = updateListLastWeek))      
+    historyCollection$update(queryStringLastWeek, update = updateStringLastWeek, upsert = TRUE)  
+  }
+  
   updateList <- list(status = 2, process = "", updated_at = updated_at)
   updateString <- ListToQuery(list('$set' = updateList)) 
   pagesCollection$update(queryString, update = updateString, upsert = TRUE)  

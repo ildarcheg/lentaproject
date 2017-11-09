@@ -54,3 +54,6 @@ MoveErrosToStage <- function(variables) {
     }
   }
 }
+
+commandArgs <- function() c(as.Date(Sys.time())-2, as.Date(Sys.time()))
+source('00_add_days.R')

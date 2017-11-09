@@ -53,3 +53,4 @@ ListToQuery <- function(listToConvert) {
 
 defaultsCollection <- GetCollection("c00_defaults")
 problemsCollection <- GetCollection("problems")
+historyCollection <- GetCollection("history")
