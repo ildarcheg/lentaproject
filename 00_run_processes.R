@@ -33,12 +33,16 @@ if (cpu > 75) {
   for (i in 1:length(collectionToExclude)) {
     dtStatusToProcess <- dtStatusToProcess[dtStatusToProcess$coll!=collectionToExclude[i], ] 
   }
+  dtStatusToProcess$status0 <- as.integer(dtStatusToProcess$status0)
   dtStatusToProcess <- dtStatusToProcess[order(dtStatusToProcess$status0, decreasing = TRUE), ]
   dtStatusToProcess$coll <- gsub(" ", "", dtStatusToProcess$coll)
+
   if (nrow(dtStatusToProcess) == 0) {
     print(paste0("SCRIPT TO RUN: nothing to run"))
   } else {
     coll <- dtStatusToProcess$coll[1]
+    print(paste0("TEMP COL:"))
+    print(coll)
     scriptToRun <- DefScripts()[DefCollections() == coll]
     commandToRun <- paste0("Rscript ", scriptToRun," 50 > ",sub(".R", ".log", scriptToRun))
     print(paste0("SCRIPT TO RUN: ", commandToRun))
