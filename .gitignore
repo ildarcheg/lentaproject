@@ -1,2 +1,6 @@
 *.csv
 *.log
+output/*
+.DS_Store
+.Rhistory
+*.Rds
