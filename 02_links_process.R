@@ -25,6 +25,7 @@ updated_at <- GetUpdatedAt()
 print(paste0("updated_at: ", updated_at))
 
 for (i in 1:numberOfLinksToProcess) {
+  #queryString <- ListToQuery(list(status = 1, process = ""))
   queryString <- ListToQuery(list(status = 0))
   updateList <- list(status = 1, process = process, updated_at = updated_at)
   updateString <- ListToQuery(list('$set' = updateList))   

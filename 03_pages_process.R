@@ -46,8 +46,10 @@ for (i in 1:nrow(pagesToProcessD)) {
   socialDF <- pagesToProcessD$social[i][[1]]
   
   commentDF <- pagesToProcessD$comments[i][[1]]
-  if (!is.null(commentDF)&!is.na(commentDF)) {
-    commentDF <- TityDataComments(commentDF)
+  if (!is.null(commentDF)) {
+    if (!is.na(commentDF)) { commentDF <- TityDataComments(commentDF) }
+  } else {
+    commentDF <- NA
   }
   updated_at <- GetUpdatedAt()
   queryString <- ListToQuery(list(link = link))
