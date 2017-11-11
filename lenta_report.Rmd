@@ -19,14 +19,22 @@ CreateInfographicsLogo(pagesOriginal = pagesOriginal, logoPath = logoPath)
 </div>
 <div class = "row">
 <div class = "col-md-6">
-```{r graph1,  warning = FALSE, message=FALSE, echo = FALSE}
+```{r graph1,  warning = FALSE, message=FALSE, echo = FALSE, fig.align = "center"}
 p <- Graph1(pagesOriginal = pagesOriginal)
 p
 ```
 </div>
 <div class = "col-md-6">
-```{r graph2,  warning = FALSE, message=FALSE, echo = FALSE}
-p <- Graph1(pagesOriginal = pagesOriginal)
+```{r graph2,  warning = FALSE, message=FALSE, echo = FALSE, fig.align = "center"}
+p <- Graph2(pagesOriginal = pagesOriginal)
+p
+```
+</div>
+</div>
+<div class = "row">
+<div class = "col-md-12">
+```{r graph3,  warning = FALSE, message=FALSE, echo = FALSE, fig.align = "center"}
+p <- Graph3(pagesOriginal = pagesOriginal)
 p
 ```
 </div>
