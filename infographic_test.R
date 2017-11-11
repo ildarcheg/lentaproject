@@ -15,10 +15,14 @@ col <- articlesCollection$find('{}', fields = '{"link":1, "linkDate":1, "page.da
 print(Sys.time())
 pages <- rbindlist(col$page, fill = TRUE)
 pages <- cbind(col$link, col$linkDate, pages, stringsAsFactors = FALSE)
-pages <- pages %>% rename(link = V1, linkDate = V2) %>% mutate(dt = ymd(linkDate))
+pages <- pages %>% 
+  rename(link = V1, linkDate = V2) %>% 
+  mutate(dt = ymd(linkDate)) %>% 
+  mutate(wordsN = str_count(stemedPlaintext," ")) %>%
+  select(-stemedPlaintext) %>%
+  mutate(datetime = ymd_hms(datetime, tz = "Europe/Moscow", quiet = TRUE))
 saveRDS(pages, "pages.Rds")
 print(Sys.time())
-
 
 # Generate Infographic in PDF format
 fontFamilyImpact = "Impact"

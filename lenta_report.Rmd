@@ -8,6 +8,9 @@ knitr::opts_chunk$set(echo = TRUE)
 source("infographic.R")
 logoPath <- "output/infographics_logo.png"
 CreateInfographicsLogo(pagesOriginal = pagesOriginal, logoPath = logoPath)
+Graph1(pagesOriginal = pagesOriginal, imagePath = "output/")
+Graph2(pagesOriginal = pagesOriginal, imagePath = "output/")
+Graph3(pagesOriginal = pagesOriginal, imagePath = "output/")
 ```
 
 <div class="col-xs-12" style="height:50px;"></div>
@@ -18,24 +21,18 @@ CreateInfographicsLogo(pagesOriginal = pagesOriginal, logoPath = logoPath)
 </div>
 </div>
 <div class = "row">
-<div class = "col-md-6">
-```{r graph1,  warning = FALSE, message=FALSE, echo = FALSE, fig.align = "center"}
-p <- Graph1(pagesOriginal = pagesOriginal)
-p
-```
+<div class = "col-lg-6 col-md-6 col-sm-6 col-xs-12">
+<img src = "output/graph1.png">
 </div>
-<div class = "col-md-6">
-```{r graph2,  warning = FALSE, message=FALSE, echo = FALSE, fig.align = "center"}
-p <- Graph2(pagesOriginal = pagesOriginal)
-p
-```
+<div class = "col-lg-6 col-md-6 col-sm-6 col-xs-12">
+<img src = "output/graph2.png">
 </div>
 </div>
 <div class = "row">
-<div class = "col-md-12">
-```{r graph3,  warning = FALSE, message=FALSE, echo = FALSE, fig.align = "center"}
-p <- Graph3(pagesOriginal = pagesOriginal)
-p
-```
+<div class = "col-lg-12 col-md-12 col-sm-12 hidden-xs">
+<img src = "output/graph3.png">
+</div>
+<div class = "hidden-lg hidden-md hidden-sm col-xs-12">
+<img src = "output/graph3_m.png">
 </div>
 </div>
