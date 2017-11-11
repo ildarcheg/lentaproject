@@ -1,0 +1,33 @@
+---
+output:
+  html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("infographic.R")
+logoPath <- "output/infographics_logo.png"
+CreateInfographicsLogo(pagesOriginal = pagesOriginal, logoPath = logoPath)
+```
+
+<div class="col-xs-12" style="height:50px;"></div>
+
+<div class = "row">
+<div class = "col-md-12">
+<img src = "output/infographics_logo.png">
+</div>
+</div>
+<div class = "row">
+<div class = "col-md-6">
+```{r graph1,  warning = FALSE, message=FALSE, echo = FALSE}
+p <- Graph1(pagesOriginal = pagesOriginal)
+p
+```
+</div>
+<div class = "col-md-6">
+```{r graph2,  warning = FALSE, message=FALSE, echo = FALSE}
+p <- Graph1(pagesOriginal = pagesOriginal)
+p
+```
+</div>
+</div>
