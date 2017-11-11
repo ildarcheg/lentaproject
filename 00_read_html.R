@@ -170,11 +170,13 @@ ReadLink <- function(link, archiveDay) {
     videoDescription <- html_nodes(videoNodes, xpath="div[@class='b-video-box__caption']") %>% 
       html_text() %>% 
       unique() %>% 
-      SetNAIfZeroLength()
+      SetNAIfZeroLength() 
+    if (!is.na(videoDescription)) { videoDescription <- paste0(videoDescription, collapse = " ") }
     videoCredits <- html_nodes(videoNodes, xpath="div[@class='b-video-box__credits']") %>% 
       html_text() %>% 
       unique() %>% 
-      SetNAIfZeroLength() 
+      SetNAIfZeroLength() %>% paste0(collapse = " ")
+    if (!is.na(videoCredits)) { videoCredits <- paste0(videoCredits, collapse = " ") }
   } else {
     videoDescription <- NA
     videoCredits <- NA
