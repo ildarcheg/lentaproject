@@ -177,11 +177,11 @@ Graph3 <- function(pagesOriginal, imagePath) {
     scale_x_continuous(breaks = unique(pages$hour)) +
     scale_y_continuous(breaks = 1:10)
   
-  p1 <- p1 + geom_text(aes(label = hourFormatted), y = 0.2, size = 5, family = fontFamilyImpact, colour = "#E7A922")
-  result <- p1 + kobe_theme()
+  p2 <- p1 + geom_text(aes(label = hourFormatted), y = 0.2, size = 5, family = fontFamilyImpact, colour = "#E7A922")
+  result <- p2 + kobe_theme()
   ggsave(paste0(imagePath, "graph3.png"), width = 18, height = 6, dpi = 300, units = "in")
   
-  p1 <- p1 + geom_text(aes(label = hourFormatted), y = 0.15, size = 2.5, family = fontFamilyImpact, colour = "#E7A922")
-  result <- p1 + kobe_theme()
+  p2 <- p1 + geom_text(aes(label = hourFormatted), y = 0.15, size = 2.5, family = fontFamilyImpact, colour = "#E7A922")
+  result <- p2 + kobe_theme()
   ggsave(paste0(imagePath, "graph3_m.png"), width = 9, height = 6, dpi = 300, units = "in")
 }
