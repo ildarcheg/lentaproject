@@ -2,6 +2,78 @@ require(jsonlite, quietly = TRUE)
 require(data.table, quietly = TRUE)
 require(lubridate, quietly = TRUE)
 source("00_dbmongo.R")
+library(grid)
+library(gridExtra)
+
+
+pagesRaw <- readRDS("pages.Rds")
+
+pagesOriginal <- pagesRaw %>% 
+  mutate(year = year(dt), month = month(dt))
+
+pagesOriginal$rubric[pagesOriginal$rubric == "Финансы"] <- "Экономика и Финансы"
+pagesOriginal$rubric[pagesOriginal$rubric == "Экономика"] <- "Экономика и Финансы"
+
+pages <- pagesOriginal %>% 
+  group_by(year, rubric) %>% 
+  count() %>% 
+  as.data.frame() %>%
+  arrange(year, -n) %>%
+  as.data.frame() %>%
+  group_by(year) %>%
+  top_n(3) %>%
+  as.data.frame() %>% filter(year %in% c(2015)) %>%
+  arrange(year, -n) 
+
+## TO FACTOR
+p1 <- ggplot(data = pages, aes(x = rubric, y = n)) + 
+  geom_bar(stat="identity", fill = "#552683") 
+result <- p1 + kobe_theme()
+
+
+pages <- pages %>% arrange(year, n) %>% top_n()
+ggplot(data = pages, aes(x = rubric, y = n)) + 
+  geom_bar(stat="identity", fill = "#552683") + 
+  facet_wrap( ~ year, ncol = 4, nrow = 5)
+
+p1
+g <- arrangeGrob(p1, p1, p1)
+ggsave("fffff.jpg", g)
+
+p3 <- ggplot(data = dat, aes(x = reorder(x, rep(1:12, 3)), y = y3, group = factor(grp))) +
+  geom_bar(stat = "identity", fill = "#552683") + coord_polar() + facet_grid(. ~ grp) +
+  ylab("Y LABEL") + xlab("X LABEL") + ggtitle("TITLE OF THE FIGURE")
+p3
+
+%>%
+  group_by(year) %>%
+  summarise(n = mean(n)) %>%
+  mutate(n = as.integer(n)) %>%
+  as.data.frame()
+
+pages1 <- pagesOriginal %>% 
+  group_by(year, linkDate) %>% 
+  count() %>% 
+  as.data.frame() %>%
+  group_by(year) %>%
+  summarise(n = mean(n)) %>%
+  mutate(n = as.integer(n)) %>%
+  as.data.frame()
+
+pages2 <- pagesOriginal %>% 
+  select(year, wordsN) %>%
+  group_by(year) %>%
+  summarise(n = median(wordsN)) %>%
+  mutate(n = as.integer(n)) %>%
+  as.data.frame()
+
+pages <- left_join(pages1, pages2, "year")
+names(pages) <- c("year", "a", "w")
+
+
+ggplot(data = pages, aes(x = year, y = n)) + 
+  geom_bar(stat="identity", fill = "#552683") + 
+  geom_text(aes(label = year), y = 12, size = 5, angle = 90, family = fontFamilyImpact, colour = "#E7A922")
 
 linksCollection <- GetCollection(DefCollections()[2])
 pagesCollection <- GetCollection(DefCollections()[3])

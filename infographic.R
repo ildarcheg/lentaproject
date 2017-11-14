@@ -189,3 +189,68 @@ Graph3 <- function(pagesOriginal, imagePath) {
   result <- p2 + kobe_theme()
   ggsave(paste0(imagePath, "graph3_m.png"), width = 9, height = 6, dpi = 300, units = "in")
 }
+
+Graph4 <- function(pagesOriginal, imagePath) {
+  
+  pagesOriginal <- pagesRaw %>% 
+    mutate(year = year(dt), month = month(dt))
+  
+  pagesOriginal$rubric[pagesOriginal$rubric == "Финансы"] <- "Экономика и Финансы"
+  pagesOriginal$rubric[pagesOriginal$rubric == "Экономика"] <- "Экономика и Финансы"
+  
+  pages <- pagesOriginal %>% 
+    group_by(year, rubric) %>% 
+    count() %>% 
+    as.data.frame() %>%
+    arrange(year, -n) %>%
+    as.data.frame() %>%
+    group_by(year) %>%
+    top_n(10) %>%
+    as.data.frame()
+
+  kobe_theme <- function() {
+    theme(
+      plot.background = element_rect(fill = "white", colour = "white"),
+      panel.background = element_rect(fill = "white"),
+      plot.title = element_text(colour = "#552683", face = "plain", size = 10, hjust = 0.5, vjust = 1, family = fontFamilyImpact),
+      axis.text = element_text(colour = "#E7A922", family = fontFamilyImpact, size = 9),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      axis.title = element_text(colour = "#552683", face = "plain", size = 12, family = fontFamilyImpact),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      panel.grid.major.x = element_blank(), #panel.grid.major.x = element_line(colour = "#E7A922"),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.minor.y = element_blank()
+    )
+  }
+  
+  pages <- pages %>% filter(year != "1999")
+  
+  years <- unique(pages$year)
+  years <- years[order(-years)]
+  pList <- list()
+  for (i in 1:length(years)) {
+    currentYear <- years[i]
+    pagesR <- pages %>% filter(year == currentYear) %>% select(-year) %>% arrange(-n)
+    pagesR$rubric <- as.factor(pagesR$rubric)
+    p1 <- ggplot(data = pagesR, aes(x = reorder(rubric, n), y = n)) + 
+      geom_bar(stat="identity", fill = "#552683") + coord_flip() +
+      ggtitle(currentYear) + 
+      scale_y_continuous(breaks = c(0, 2500, 5000, 7500, 10000), limits = c(0, 20000)) + 
+      geom_text(aes(label = rubric), size = 4, hjust = -0.1, family = fontFamilyImpact, colour = "#E7A922") + 
+      kobe_theme()
+    if (((i-1)%%5) == 0) {
+      p1 <- p1 + xlab("Rubric") 
+    } else {
+      p1 <- p1 + xlab(" ") 
+    }
+    pList[[i]] <- p1
+  }
+  g <- arrangeGrob(grobs = pList, ncol = 6)
+  ggsave(paste0(imagePath, "graph4.png"), plot = g, width = 18, height = 12, dpi = 300, units = "in")
+  g <- arrangeGrob(grobs = pList, ncol = 3)
+  ggsave(paste0(imagePath, "graph4_m.png"), plot = g, width = 9, height = 24, dpi = 300, units = "in")
+  
+}

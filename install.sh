@@ -124,6 +124,14 @@ sudo echo 'install.packages("stringr")' | sudo tee -a install_packages.R
 sudo echo 'require(stringr)' | sudo tee -a load_packages.R
 sudo echo 'install.packages("tm")' | sudo tee -a install_packages.R
 sudo echo 'require(tm)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("ggplot2")' | sudo tee -a install_packages.R
+sudo echo 'require(ggplot2)' | sudo tee -a load_packages.R
+sudo echo 'install.packages("gridExtra")' | sudo tee -a install_packages.R
+sudo echo 'require(gridExtra)' | sudo tee -a load_packages.R
+
+cd && wget https://raw.githubusercontent.com/hotice/webupd8/master/install-google-fonts
+chmod +x install-google-fonts
+./install-google-fonts
 
 #wget http://download.cdn.yandex.net/mystem/mystem-3.0-linux3.1-64bit.tar.gz
 #tar -xvzf mystem-3.0-linux3.1-64bit.tar.gz
