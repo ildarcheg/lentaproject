@@ -3,6 +3,9 @@ require(dplyr, quietly = TRUE)
 require(tidyr, quietly = TRUE)
 require(lubridate, quietly = TRUE)
 require(stringr, quietly = TRUE)
+library(grid)
+library(gridExtra)
+
 #library(extrafont)
 #font_import() # Import all fonts
 #fonts() # Print list of all fonts
@@ -45,7 +48,7 @@ CreateInfographicsLogo <- function(pagesOriginal, logoPath) {
     "http://www.lenta.ru",
     "Ildar Gabdrakhmanov",
     "Daily",
-    as.Date(Sys.time()),
+    Sys.time(),
     "1999-2017", 
     numberOfArticles, sep = "\n"), vjust = 0, hjust = 0, x = unit(0.15, "npc"), y = unit(0.11, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
   dev.off()
@@ -65,11 +68,11 @@ Graph1 <- function(pagesOriginal, imagePath) {
     theme(
       plot.background = element_rect(fill = "white", colour = "white"),
       panel.background = element_rect(fill = "white"),
-      plot.title = element_text(colour = "#552683", face = "bold", size = 25, hjust = 0.5, vjust = 1, family = fontFamilyImpact),
+      plot.title = element_text(colour = "#552683", face = "plain", size = 25, hjust = 0.5, vjust = 1, family = fontFamilyImpact),
       axis.text = element_text(colour = "#E7A922", family = fontFamilyImpact),
       axis.text.x=element_blank(),
       axis.ticks.x=element_blank(),
-      axis.title = element_text(colour = "#552683", face = "bold", size = 13, family = fontFamilyImpact),
+      axis.title = element_text(colour = "#552683", face = "plain", size = 13, family = fontFamilyImpact),
       axis.title.x = element_text(margin = margin(t = -10, r = 0, b = 0, l = 0)),
       axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
       panel.grid.major.x = element_blank(),
@@ -88,8 +91,9 @@ Graph1 <- function(pagesOriginal, imagePath) {
     scale_x_continuous(breaks = unique(pages$year)) +
     geom_text(aes(label = year), y = 12, size = 5, angle = 90, family = fontFamilyImpact, colour = "#E7A922")
   result <- p1 + kobe_theme()
-  #result
+
   ggsave(paste0(imagePath, "graph1.png"), width = 9, height = 6, dpi = 300, units = "in")
+  
 }
 
 Graph2 <- function(pagesOriginal, imagePath) {
@@ -105,11 +109,11 @@ Graph2 <- function(pagesOriginal, imagePath) {
     theme(
       plot.background = element_rect(fill = "white", colour = "white"),
       panel.background = element_rect(fill = "white"),
-      plot.title = element_text(colour = "#552683", face = "bold", size = 25, hjust = 0.5, vjust = 1, family = fontFamilyImpact),
+      plot.title = element_text(colour = "#552683", face = "plain", size = 25, hjust = 0.5, vjust = 1, family = fontFamilyImpact),
       axis.text = element_text(colour = "#E7A922", family = fontFamilyImpact),
       axis.text.x=element_blank(),
       axis.ticks.x=element_blank(),
-      axis.title = element_text(colour = "#552683", face = "bold", size = 13, family = fontFamilyImpact),
+      axis.title = element_text(colour = "#552683", face = "plain", size = 13, family = fontFamilyImpact),
       axis.title.x = element_text(margin = margin(t = -10, r = 0, b = 0, l = 0)),
       axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
       panel.grid.major.x = element_blank(),
@@ -124,7 +128,7 @@ Graph2 <- function(pagesOriginal, imagePath) {
     xlab("Year") + 
     ylab("Words per article") + 
     ggtitle("Average number of words per article") +
-    scale_y_continuous(breaks = c(0, 50, 100, 150, 200), limits = c(0, 160)) +
+    scale_y_continuous(breaks = c(0, 50, 100, 150, 200), limits = c(0, 200)) +
     scale_x_continuous(breaks = unique(pages$year)) +
     geom_text(aes(label = year), y = 12, size = 5, angle = 90, family = fontFamilyImpact, colour = "#E7A922")
   result <- p1 + kobe_theme()
@@ -155,11 +159,11 @@ Graph3 <- function(pagesOriginal, imagePath) {
     theme(
       plot.background = element_rect(fill = "white", colour = "white"),
       panel.background = element_rect(fill = "white"),
-      plot.title = element_text(colour = "#552683", face = "bold", size = 25, hjust = 0.5, vjust = 1, family = fontFamilyImpact),
+      plot.title = element_text(colour = "#552683", face = "plain", size = 25, hjust = 0.5, vjust = 1, family = fontFamilyImpact),
       axis.text = element_text(colour = "#E7A922", family = fontFamilyImpact),
       axis.text.x=element_blank(),
       axis.ticks.x=element_blank(),
-      axis.title = element_text(colour = "#552683", face = "bold", size = 13, family = fontFamilyImpact),
+      axis.title = element_text(colour = "#552683", face = "plain", size = 13, family = fontFamilyImpact),
       axis.title.x = element_text(margin = margin(t = -10, r = 0, b = 0, l = 0)),
       axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
       panel.grid.major.x = element_blank(),
