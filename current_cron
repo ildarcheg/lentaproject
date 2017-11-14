@@ -27,23 +27,16 @@
 * *   * * *   cd /home/ildar/lentaproject/; sleep 40; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp.log > cpu.log; rm cpu_temp.log # LENTA R SCRIPT
 * *   * * *   cd /home/ildar/lentaproject/; sleep 50; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp.log > cpu.log; rm cpu_temp.log # LENTA R SCRIPT
 * *   * * *   cd /home/ildar/lentaproject/; sleep 00; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 03; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 06; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 09; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 12; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 05; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 10; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
 * *   * * *   cd /home/ildar/lentaproject/; sleep 15; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 18; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 21; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 24; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 27; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 20; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 25; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
 * *   * * *   cd /home/ildar/lentaproject/; sleep 30; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 33; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 36; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 39; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 42; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 35; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 40; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
 * *   * * *   cd /home/ildar/lentaproject/; sleep 45; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 48; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 51; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 54; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
-* *   * * *   cd /home/ildar/lentaproject/; sleep 57; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 50; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
+* *   * * *   cd /home/ildar/lentaproject/; sleep 55; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT
 1,16,31,46 * * * *   cd /home/ildar/lentaproject/; Rscript 00_back_to_stage.R # LENTA R SCRIPT
+*/30 * * * *   cd /home/ildar/lentaproject/; Rscript 00_everyday_update.R # LENTA R SCRIPT

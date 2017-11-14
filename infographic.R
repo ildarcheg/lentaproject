@@ -8,7 +8,7 @@ require(stringr, quietly = TRUE)
 #fonts() # Print list of all fonts
 fontFamilyImpact <- "Impact"
 
-pagesRaw <- readRDS("pages.Rds")
+pagesRaw <- readRDS("articles_01.Rds")
 
 pagesOriginal <- pagesRaw %>% 
   mutate(year = year(dt), month = month(dt))

@@ -8,7 +8,7 @@ for (i in 1:length(timer)) {
   crontabToAdd <- c(crontabToAdd, cron)
 }
 
-timer <- formatC(seq(0, 59, 3), width = 2, format = "d", flag = "0")
+timer <- formatC(seq(0, 59, 5), width = 2, format = "d", flag = "0")
 for (i in 1:length(timer)) {
   cron <- paste0('* *   * * *   cd /home/ildar/lentaproject/; sleep ', timer[i], '; Rscript 00_run_processes.R > process_t.log; mv process_t.log process.log # LENTA R SCRIPT')
   crontabToAdd <- c(crontabToAdd, cron)
@@ -17,8 +17,8 @@ for (i in 1:length(timer)) {
 cron <- paste0('1,16,31,46 * * * *   cd /home/ildar/lentaproject/; Rscript 00_back_to_stage.R # LENTA R SCRIPT')
 crontabToAdd <- c(crontabToAdd, cron)
 
-#cron <- paste0('*/15 * * * *   cd /home/ildar/lentaproject/; Rscript 00_everyday_update.R # LENTA R SCRIPT')
-#crontabToAdd <- c(crontabToAdd, cron)
+cron <- paste0('*/30 * * * *   cd /home/ildar/lentaproject/; Rscript 00_everyday_update.R # LENTA R SCRIPT')
+crontabToAdd <- c(crontabToAdd, cron)
 
 #crontabToAdd <- c()
 crontab <- system('crontab -l', intern = TRUE)

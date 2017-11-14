@@ -44,7 +44,7 @@ if (cpu > 75) {
     print(paste0("TEMP COL:"))
     print(coll)
     scriptToRun <- DefScripts()[DefCollections() == coll]
-    commandToRun <- paste0("Rscript ", scriptToRun," 50 > ",sub(".R", ".log", scriptToRun))
+    commandToRun <- paste0("Rscript ", scriptToRun," 20 > ",sub(".R", ".log", scriptToRun))
     print(paste0("SCRIPT TO RUN: ", commandToRun))
     system(commandToRun, wait=FALSE, ignore.stdout = TRUE, ignore.stderr = TRUE)
   }

@@ -34,6 +34,10 @@ updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', up
 GetCollection(DefCollections()[2])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE)  
 
 updated_at <- GetUpdatedAt()
+updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
+GetCollection(DefCollections()[3])$update('{}', update = updateString, upsert = FALSE, multiple = TRUE)  
+
+updated_at <- GetUpdatedAt()
 queryString <- paste0('{"status":1}')
 updateString <- paste0('{ "$set": {"status":0, "process":"", "updated_at":"', updated_at, '"} }')
 GetCollection(DefCollections()[3])$update(queryString, update = updateString, upsert = FALSE, multiple = TRUE) 
