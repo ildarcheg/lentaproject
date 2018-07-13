@@ -99,35 +99,37 @@ sudo service sysstat restart
 
 # sudo echo '/usr/sbin/ufw enable' | sudo tee /etc/rc.local
 
-sudo echo 'install.packages("memoise")' | sudo tee install_packages.R
-sudo echo 'require(memoise)' | sudo tee load_packages.R
-sudo echo 'install.packages("devtools")' | sudo tee -a install_packages.R
-sudo echo 'require(devtools)' | sudo tee -a install_packages.R
-sudo echo 'require(devtools)' | sudo tee -a load_packages.R
-sudo echo 'devtools::install_github("jayjacobs/tldextract")' | sudo tee -a install_packages.R
-sudo echo 'require(tldextract)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("mongolite")' | sudo tee -a install_packages.R
-sudo echo 'require(mongolite)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("lubridate")' | sudo tee -a install_packages.R
-sudo echo 'require(lubridate)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("rvest")' | sudo tee -a install_packages.R
-sudo echo 'require(rvest)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("dplyr")' | sudo tee -a install_packages.R
-sudo echo 'require(dplyr)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("tibble")' | sudo tee -a install_packages.R
-sudo echo 'require(tibble)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("tidyr")' | sudo tee -a install_packages.R
-sudo echo 'require(tidyr)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("data.table")' | sudo tee -a install_packages.R
-sudo echo 'require(data.table)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("stringr")' | sudo tee -a install_packages.R
-sudo echo 'require(stringr)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("tm")' | sudo tee -a install_packages.R
-sudo echo 'require(tm)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("ggplot2")' | sudo tee -a install_packages.R
-sudo echo 'require(ggplot2)' | sudo tee -a load_packages.R
-sudo echo 'install.packages("gridExtra")' | sudo tee -a install_packages.R
-sudo echo 'require(gridExtra)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("memoise")' | sudo tee install_packages.R
+# sudo echo 'require(memoise)' | sudo tee load_packages.R
+# sudo echo 'install.packages("devtools")' | sudo tee -a install_packages.R
+# sudo echo 'require(devtools)' | sudo tee -a install_packages.R
+# sudo echo 'require(devtools)' | sudo tee -a load_packages.R
+# sudo echo 'devtools::install_github("jayjacobs/tldextract")' | sudo tee -a install_packages.R
+# sudo echo 'require(tldextract)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("mongolite")' | sudo tee -a install_packages.R
+# sudo echo 'require(mongolite)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("lubridate")' | sudo tee -a install_packages.R
+# sudo echo 'require(lubridate)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("rvest")' | sudo tee -a install_packages.R
+# sudo echo 'require(rvest)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("dplyr")' | sudo tee -a install_packages.R
+# sudo echo 'require(dplyr)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("tibble")' | sudo tee -a install_packages.R
+# sudo echo 'require(tibble)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("tidyr")' | sudo tee -a install_packages.R
+# sudo echo 'require(tidyr)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("data.table")' | sudo tee -a install_packages.R
+# sudo echo 'require(data.table)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("stringr")' | sudo tee -a install_packages.R
+# sudo echo 'require(stringr)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("tm")' | sudo tee -a install_packages.R
+# sudo echo 'require(tm)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("ggplot2")' | sudo tee -a install_packages.R
+# sudo echo 'require(ggplot2)' | sudo tee -a load_packages.R
+# sudo echo 'install.packages("gridExtra")' | sudo tee -a install_packages.R
+# sudo echo 'require(gridExtra)' | sudo tee -a load_packages.R
+
+Rscript -e "install.packages(c('lubridate', 'rvest', 'dplyr', 'tidyr', 'purrr', 'XML', 'data.table', 'stringr', 'jsonlite', 'reshape2', 'tibble', 'tm', 'ggplot2', 'gridExtra', 'rmarkdown'))"
 
 cd && wget https://raw.githubusercontent.com/hotice/webupd8/master/install-google-fonts
 chmod +x install-google-fonts
