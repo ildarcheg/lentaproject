@@ -28,13 +28,13 @@ CreateInfographicsLogo <- function(pagesOriginal, logoPath) {
   grid.newpage() 
   #pushViewport(viewport(layout = grid.layout(4, 3)))
   grid.rect(gp = gpar(fill = "white", col = "white")) #E2E2E3
-  grid.text("INFOGRAPHIC", y = unit(0.99, "npc"), x = unit(0.5, "npc"), vjust = 1, hjust = .5, gp = gpar(fontfamily = "Impact", col = "#A9A8A7", cex = 12, alpha = 0.3))
-  grid.text("LENTA.RU", y = unit(0.68, "npc"), gp = gpar(fontfamily = "Impact", col = "#E7A922", cex = 6.4))
-  grid.text("BY ILDAR GABDRAKHMANOV", vjust = 0, y = unit(0.51, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
+  grid.text("INFOGRAPHIC", y = unit(0.99, "npc"), x = unit(0.5, "npc"), vjust = 1, hjust = .5, gp = gpar(fontfamily = "Anton", col = "#A9A8A7", cex = 12.8, alpha = 0.3))
+  grid.text("LENTA.RU", y = unit(0.645, "npc"), gp = gpar(fontfamily = "Anton", col = "#E7A922", cex = 6.4))
+  grid.text("BY ILDAR GABDRAKHMANOV", vjust = 0, y = unit(0.49, "npc"), gp = gpar(fontfamily = "Anton", col = "#552683", cex = 0.8))
   #grid.text("ANALYSIS WITH PROGRAMMING", vjust = 0, y = unit(0.913, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
   #grid.text("lenta.report", vjust = 0, y = unit(0.906, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
-  grid.rect(gp = gpar(fill = "#E7A922", col = "#E7A922"), x = unit(0.5, "npc"), y = unit(0.24, "npc"), width = unit(1, "npc"), height = unit(0.48, "npc")) #E7A922
-  grid.text("CATEGORY", y = unit(0.24, "npc"), x = unit(0.5, "npc"), vjust = .5, hjust = .5, gp = gpar(fontfamily = "Impact", col = "#CA8B01", cex = 13, alpha = 0.3))
+  grid.rect(gp = gpar(fill = "#E7A922", col = "#E7A922"), x = unit(0.5, "npc"), y = unit(0.24, "npc"), width = unit(1, "npc"), height = unit(0.47, "npc")) #E7A922
+  grid.text("INFOGRAPHIC", y = unit(0.24, "npc"), x = unit(0.5, "npc"), vjust = .5, hjust = .5, gp = gpar(fontfamily = "Anton", col = "#CA8B01", cex = 13, alpha = 0.3))
   #grid.text("A VERY VERY VERY VERY LONG TITLE", vjust = 0, hjust = 0, x = unit(0.01, "npc"), y = unit(0.88, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 1.2))
   grid.text("DATA INFO", vjust = 0, hjust = 0, x = unit(0.01, "npc"), y = unit(0.41, "npc"), gp = gpar(fontfamily = "Impact", col = "white", cex = 1.2))
   grid.text(paste(
