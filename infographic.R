@@ -179,7 +179,7 @@ Graph3 <- function(pagesOriginal, imagePath) {
     ylab("Articles per hour") + 
     ggtitle("Average number of articles per hour") +
     scale_x_continuous(breaks = unique(pages$hour)) +
-    scale_y_continuous(breaks = 1:10)
+    scale_y_continuous(breaks = 0:13)
   
   p2 <- p1 + geom_text(aes(label = hourFormatted), y = 0.2, size = 5, family = fontFamilyImpact, colour = "#E7A922")
   result <- p2 + kobe_theme()
@@ -248,9 +248,9 @@ Graph4 <- function(pagesOriginal, imagePath) {
     }
     pList[[i]] <- p1
   }
-  g <- arrangeGrob(grobs = pList, ncol = 6)
+  g <- arrangeGrob(grobs = pList, ncol = 5)
   ggsave(paste0(imagePath, "graph4.png"), plot = g, width = 18, height = 12, dpi = 300, units = "in")
-  g <- arrangeGrob(grobs = pList, ncol = 3)
+  g <- arrangeGrob(grobs = pList, ncol = 1)
   ggsave(paste0(imagePath, "graph4_m.png"), plot = g, width = 9, height = 24, dpi = 300, units = "in")
   
 }
