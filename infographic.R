@@ -25,7 +25,7 @@ CreateInfographicsLogo <- function(pagesOriginal, logoPath) {
   
   # Generate Infographic in PNG Format
   png(logoPath, width = 10, height = 4, units = "in", res = 500)
-  grid.newpage() 
+  grid.newpage()
   #pushViewport(viewport(layout = grid.layout(4, 3)))
   grid.rect(gp = gpar(fill = "white", col = "white")) #E2E2E3
   grid.text("INFOGRAPHIC", y = unit(0.99, "npc"), x = unit(0.5, "npc"), vjust = 1, hjust = .5, gp = gpar(fontfamily = "Anton", col = "#A9A8A7", cex = 12.8, alpha = 0.3))
@@ -49,8 +49,37 @@ CreateInfographicsLogo <- function(pagesOriginal, logoPath) {
     "Ildar Gabdrakhmanov",
     "Daily",
     Sys.time(),
-    "1999-2017", 
+    "2014-2018",
     numberOfArticles, sep = "\n"), vjust = 0, hjust = 0, x = unit(0.15, "npc"), y = unit(0.11, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
+  dev.off()
+}
+
+CreateInfographicsLogo2 <- function(pagesOriginal, logoPath) {
+  require(ggplot2)
+  require(grid)
+  require(gridExtra)
+
+  numberOfArticles <- nrow(pagesOriginal)
+
+  # Generate Infographic in PNG Format
+  #logoPath <- 'tt.png'
+  png(logoPath, width = 10, height = 1.5, units = "in", res = 500)
+  grid.newpage()
+  grid.rect(gp = gpar(fill = "white", col = "white")) #E2E2E3
+  grid.text(paste(
+    "Most shared article:",
+    "Most commented article:",
+    "Articles published: ",
+    "Putin mentioned (times):",
+    "Trump mentioned (times):",
+    "Number of articles", sep = "\n"), vjust = 0, hjust = 0, x = unit(0.01, "npc"), y = unit(0.11, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
+  grid.text(paste(
+    "http://www.lenta.ru",
+    "Ildar Gabdrakhmanov",
+    "Daily",
+    Sys.time(),
+    "2014-2018",
+    numberOfArticles, sep = "\n"), vjust = 0, hjust = 0, x = unit(0.20, "npc"), y = unit(0.11, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
   dev.off()
 }
 
@@ -179,7 +208,7 @@ Graph3 <- function(pagesOriginal, imagePath) {
     ylab("Articles per hour") + 
     ggtitle("Average number of articles per hour") +
     scale_x_continuous(breaks = unique(pages$hour)) +
-    scale_y_continuous(breaks = 1:10)
+    scale_y_continuous(breaks = 0:13)
   
   p2 <- p1 + geom_text(aes(label = hourFormatted), y = 0.2, size = 5, family = fontFamilyImpact, colour = "#E7A922")
   result <- p2 + kobe_theme()
@@ -248,9 +277,9 @@ Graph4 <- function(pagesOriginal, imagePath) {
     }
     pList[[i]] <- p1
   }
-  g <- arrangeGrob(grobs = pList, ncol = 6)
+  g <- arrangeGrob(grobs = pList, ncol = 5)
   ggsave(paste0(imagePath, "graph4.png"), plot = g, width = 18, height = 12, dpi = 300, units = "in")
-  g <- arrangeGrob(grobs = pList, ncol = 3)
+  g <- arrangeGrob(grobs = pList, ncol = 1)
   ggsave(paste0(imagePath, "graph4_m.png"), plot = g, width = 9, height = 24, dpi = 300, units = "in")
   
 }
