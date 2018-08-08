@@ -36,11 +36,13 @@ DefScripts <- function() {
 
 Thus, adding period to `c01_daytobeprocessed`, I get all articles stored at `c04_articlestobeprocessed` in a while.
 
-To automate this process and to make it scalable I used following techics. Using `00_set_schedules.R` script I setup cron jobs that runs `sar 1 5` every 10 seconds (to check CPU load) and `00_run_processes.R`, which checks CPU load and, if it is less than 75%, gets first 10 days drom `c01_daytobeprocessed` and runs `01_days_process.R`. At the same time the same script check out other collections and runs scripts related to that collections.
+To automate this process and to make it scalable I used following technics. Using `00_set_schedules.R` script I setup cron jobs that runs `sar 1 5` every 10 seconds (to check CPU load) and `00_run_processes.R`, which checks CPU load and, if it is less than 75%, gets first 10 days drom `c01_daytobeprocessed` and runs `01_days_process.R`. At the same time the same script check out other collections and runs scripts related to that collections.
 
-This is how DB looks like before adding dates to first collections (easily check it with helps of `00_status.R` script):
+To see how everything looks before we start:
 ```
-ildar@instance-1:~/lentaproject$ Rscript 00_status.R 
+Rscript 00_status.R 
+```
+```
 [1] "---------------------"
 [1] "START: 2018-07-13-12-40-29 UTC"
 [1] "CPU: 1.12"
@@ -57,11 +59,13 @@ ildar@instance-1:~/lentaproject$ Rscript 00_status.R
 ildar@instance-1:~/lentaproject$
 ```
 
-Rscript 00_add_days.R 2018-01-01 2018-06-30
-
-How it looks right after adding the dates:
+To add first 6 months of 2018:
 ```
-ildar@instance-1:~/lentaproject$ Rscript 00_status.R  
+Rscript 00_add_days.R 2018-01-01 2018-06-30
+```
+
+How DB looks right after adding the dates:
+```
 [1] "---------------------"
 [1] "START: 2018-07-13-12-42-35 UTC"
 [1] "CPU: 0.6"
@@ -79,7 +83,6 @@ ildar@instance-1:~/lentaproject$ Rscript 00_status.R
 
 How it looks 5 min after adding the dates:
 ```
-ildar@instance-1:~/lentaproject$ Rscript 00_status.R 
 [1] "---------------------"
 [1] "START: 2018-07-13-12-47-54 UTC"
 [1] "CPU: 45.71"
@@ -102,3 +105,45 @@ ildar@instance-1:~/lentaproject$ Rscript 00_status.R
 7 problems                      0       0       0       0         0  0
 ```
 
+How it looks when finished:
+```
+[1] "---------------------"
+[1] "START: 2018-07-14-09-38-56 UTC"
+[1] "CPU: 0.8"
+[1] "ALREADY STARTED PROCESSES: no processes found"
+[1] "CURRENT DB STATUS:"
+                       coll total status0 status1 status2 processes  Mb
+1 c00_defaults                  1       0       0       0         0   0
+2 c01_daytobeprocessed        186       0       0     186         1   0
+3 c02_linkstobeprocessed    22387       0       0   22387         1   3
+4 c03_pagestobeprocessed    22343       0       0   22343         1 661
+5 c04_articlestobeprocessed 22343   22343       0       0         1 840
+6 history                   19633       0       0       0         1 692
+7 problems                      2       0       0       0         0   0
+```
+
+ildar@instance-1:~/lentaproject$ Rscript  00_status.R 
+During startup - Warning message:
+Setting LC_CTYPE failed, using "C" 
+[1] "---------------------"
+[1] "START: 2018-07-15-10-55-53 UTC"
+[1] "CPU: 0.7"
+[1] "ALREADY STARTED PROCESSES:"
+              script   PID cpu memory
+1 02_links_process.R  6246   0    0.5
+2 02_links_process.R  6413   0    0.4
+3 02_links_process.R 15710   0    0.5
+4 02_links_process.R 16107   0    0.5
+5 02_links_process.R 16567   0    0.5
+6 02_links_process.R 17105   0    0.5
+7 02_links_process.R 17587   0    0.4
+8 02_links_process.R 18157   0    0.4
+[1] "CURRENT DB STATUS:"
+                       coll  total status0 status1 status2 processes   Mb
+1 c00_defaults                   1       0       0       0         0    0
+2 c01_daytobeprocessed        1648       0       0    1648         1    0
+3 c02_linkstobeprocessed    242030       0       0  242030         1   36
+4 c03_pagestobeprocessed    241422       0       0  241668         1 3368
+5 c04_articlestobeprocessed 241338  241668       0       0         1 5778
+6 history                    25947       0       0       0         1  957
+7 problems                      23       0       0       0         0    0
