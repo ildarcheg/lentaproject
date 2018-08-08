@@ -8,6 +8,8 @@ knitr::opts_chunk$set(echo = TRUE)
 source("infographic.R")
 logoPath <- "output/infographics_logo.png"
 CreateInfographicsLogo(pagesOriginal = pagesOriginal, logoPath = logoPath)
+logoPath2 <- "output/infographics_logo2.png"
+CreateInfographicsLogo2(pagesOriginal = pagesOriginal, logoPath = logoPath2)
 Graph1(pagesOriginal = pagesOriginal, imagePath = "output/")
 Graph2(pagesOriginal = pagesOriginal, imagePath = "output/")
 Graph3(pagesOriginal = pagesOriginal, imagePath = "output/")
@@ -19,6 +21,11 @@ Graph4(pagesOriginal = pagesOriginal, imagePath = "output/")
 <div class = "row">
 <div class = "col-md-12">
 <img src = "output/infographics_logo.png">
+</div>
+</div>
+<div class = "row">
+<div class = "col-md-12">
+<img src = "output/infographics_logo2.png">
 </div>
 </div>
 <div class = "row">

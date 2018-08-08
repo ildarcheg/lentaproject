@@ -1,8 +1,12 @@
 require(jsonlite, quietly = TRUE)
 require(data.table, quietly = TRUE)
 require(lubridate, quietly = TRUE)
+require(stringr, quietly = TRUE)
 source("00_dbmongo.R")
 
+numextract <- function(string){ 
+  str_extract(string, "\\-*\\d+\\.*\\d*")
+}
 
 system.time(system("mongo lenta export_articles_01.js > articles_01.csv", intern = FALSE, wait = TRUE))
 print(Sys.time())
@@ -12,9 +16,17 @@ pages <- col2 %>%
   mutate(dt = ymd(linkDate)) %>% 
   mutate(wordsN = str_count(stemedPlaintext," ")) %>%
   select(-stemedPlaintext) %>%
+  rename(FB = social) %>% mutate(FB = as.numeric(numextract(FB))) %>% 
+  rename(VK = V8) %>% mutate(VK = as.numeric(numextract(VK))) %>% 
+  rename(OK = V9) %>% mutate(OK = as.numeric(numextract(OK))) %>% 
+  rename(Com = V10) %>% mutate(Com = as.numeric(numextract(Com))) %>% 
   mutate(datetime = ymd_hms(datetime, tz = "Europe/Moscow", quiet = TRUE))
 saveRDS(pages, "articles_01.Rds")
 print(Sys.time())
+pagesRaw <- readRDS("articles_01.Rds")
+
+# pagesRaw$wordTrump <- str_count(pagesRaw$stemedPlaintext, 'трамп')
+# pagesRaw$wordPutin <- str_count(pagesRaw$stemedPlaintext, 'путин')
 
 # 
 # print(Sys.time())
