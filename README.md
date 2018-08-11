@@ -36,7 +36,7 @@ DefScripts <- function() {
 
 Thus, adding period to `c01_daytobeprocessed`, I get all articles stored at `c04_articlestobeprocessed` in a while.
 
-To automate this process and to make it scalable I used following technics. Using `00_set_schedules.R` script I setup cron jobs that runs `sar 1 5` every 10 seconds (to check CPU load) and `00_run_processes.R`, which checks CPU load and, if it is less than 75%, gets first 10 days drom `c01_daytobeprocessed` and runs `01_days_process.R`. At the same time the same script check out other collections and runs scripts related to that collections.
+To automate this process and to make it scalable I used following technics. Using `00_set_schedules.R` script I setup cron jobs that runs `sar 1 5` every 10 seconds (to monitor CPU load) and `00_run_processes.R`, which checks CPU load and, if it is less than 75%, gets first 10 days drom `c01_daytobeprocessed` and runs `01_days_process.R`. At the same time the same script check out other collections and runs scripts related to that collections.
 
 To see how everything looks before we start:
 ```
@@ -122,28 +122,48 @@ How it looks when finished:
 7 problems                      2       0       0       0         0   0
 ```
 
-ildar@instance-1:~/lentaproject$ Rscript  00_status.R 
-During startup - Warning message:
+How it looks when daily update is enabled:
+```
 Setting LC_CTYPE failed, using "C" 
 [1] "---------------------"
-[1] "START: 2018-07-15-10-55-53 UTC"
-[1] "CPU: 0.7"
+[1] "START: 2018-08-11-19-34-46 UTC"
+[1] "CPU: 85.84"
 [1] "ALREADY STARTED PROCESSES:"
-              script   PID cpu memory
-1 02_links_process.R  6246   0    0.5
-2 02_links_process.R  6413   0    0.4
-3 02_links_process.R 15710   0    0.5
-4 02_links_process.R 16107   0    0.5
-5 02_links_process.R 16567   0    0.5
-6 02_links_process.R 17105   0    0.5
-7 02_links_process.R 17587   0    0.4
-8 02_links_process.R 18157   0    0.4
+              script   PID  cpu memory
+1 03_pages_process.R 10284  5.4    0.7
+2 03_pages_process.R 10406  5.6    0.7
+3 03_pages_process.R 10819  9.3    0.6
+4 03_pages_process.R 11005 13.9    0.6
 [1] "CURRENT DB STATUS:"
                        coll  total status0 status1 status2 processes   Mb
-1 c00_defaults                   1       0       0       0         0    0
-2 c01_daytobeprocessed        1648       0       0    1648         1    0
-3 c02_linkstobeprocessed    242030       0       0  242030         1   36
-4 c03_pagestobeprocessed    241422       0       0  241668         1 3368
-5 c04_articlestobeprocessed 241338  241668       0       0         1 5778
-6 history                    25947       0       0       0         1  957
-7 problems                      23       0       0       0         0    0
+1 c00_defaults                   0       0       0       0         0    0
+2 c01_daytobeprocessed        1665       0       0    1665         1    0
+3 c02_linkstobeprocessed    244299      46       0  244253         1   37
+4 c03_pagestobeprocessed    243926      39      51  243836         6 3452
+5 c04_articlestobeprocessed 243926  243926       0       0         1 5884
+6 history                        0       0       0       0         1 6977
+7 problems                       0       0       0       0         0    0
+```
+
+The core of this ETL is `cron` (time-based job scheduler). It is set up by `00_set_schedules.R` script and generally looks like:
+```
+* *   * * *   cd /home/ildar/lentaproject/; sleep 00; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 10; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 20; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 30; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 40; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 50; sar 1 5 -o cpu_temp.log > /dev/null 2>&1; sar -f cpu_temp$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 05; Rscript 00_run_processes.R > process_t.log; mv process_t.$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 15; Rscript 00_run_processes.R > process_t.log; mv process_t.$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 25; Rscript 00_run_processes.R > process_t.log; mv process_t.$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 35; Rscript 00_run_processes.R > process_t.log; mv process_t.$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 45; Rscript 00_run_processes.R > process_t.log; mv process_t.$
+* *   * * *   cd /home/ildar/lentaproject/; sleep 55; Rscript 00_run_processes.R > process_t.log; mv process_t.$
+1,16,31,46 * * * *   cd /home/ildar/lentaproject/; Rscript 00_back_to_stage.R # LENTA R SCRIPT
+1,16,31,46 * * * *   cd /home/ildar/lentaproject/; Rscript 00_prepare_data_for_analisys.R # LENTA R SCRIPT
+10,25,40,55 * * * *   cd /home/ildar/lentaproject/; bash send_report_to_web.sh # LENTA R SCRIPT
+*/30 * * * *   cd /home/ildar/lentaproject/; Rscript 00_everyday_update.R # LENTA R SCRIPT
+```
+
+Jobs scheduled with this `cron` above run `sar` every 10 second for monitoring and logging CPU activity. Also it runs `00_run_processes.R` script that looks in all 4 collection for the objects that have to be processed (that have status = 0). Every 30 min it updates `c01_daytobeprocessed` with two dates - today and yesterday. Every 15 min it runs shell script `send_report_to_web.sh` and updates webpage. 
+
