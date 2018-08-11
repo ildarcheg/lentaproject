@@ -6,6 +6,9 @@ require(stringr, quietly = TRUE)
 library(grid)
 library(gridExtra)
 
+require(jsonlite, quietly = TRUE)
+source("00_dbmongo.R")
+
 #library(extrafont)
 #font_import() # Import all fonts
 #fonts() # Print list of all fonts
@@ -59,27 +62,63 @@ CreateInfographicsLogo2 <- function(pagesOriginal, logoPath) {
   require(grid)
   require(gridExtra)
 
-  numberOfArticles <- nrow(pagesOriginal)
-
+  # getting 24 hours limit
+  limitDay <- max(pagesOriginal$datetime, na.rm = TRUE) - 24*60*60
+  pagesOriginalCopy <- pagesOriginal %>% filter(datetime >= limitDay) %>% mutate(share = (FB+VK+OK))
+  
+  # getting top commented article
+  topComments <- pagesOriginalCopy %>% top_n(1, Com)
+  articlesCollection <- GetCollection(DefCollections()[4])
+  queryString <- ListToQuery(list(link = topComments$link[1]))
+  articles <- articlesCollection$find(queryString)
+  shortTo60 <- function(titleToShort) {
+    if (nchar(titleToShort) > 60) {
+      shortedTitle <- paste0(substr(titleToShort, start = 1, stop = 60), "...")
+    } else {
+      shortedTitle <- titleToShort
+    }
+    shortedTitle
+  }
+  topCommentedArticle <- paste0(shortTo60(articles$page[[1]]$metaTitle), " / ", articles$page[[1]]$rubric, " / ", articles$page[[1]]$datetime, " MSK")
+  
+  # getting top shared article
+  topShared <- pagesOriginalCopy %>% top_n(1, share)
+  queryString <- ListToQuery(list(link = topShared$link[1]))
+  articles <- articlesCollection$find(queryString)
+  topSharedArticle <- paste0(shortTo60(articles$page[[1]]$metaTitle), " / ", articles$page[[1]]$rubric, " / ", articles$page[[1]]$datetime, " MSK")  
+  numberOfArticles <- nrow(pagesOriginalCopy)
+  
+  # getting putin and trump
+  words <- c()
+  for (i in 1:nrow(pagesOriginalCopy)) {
+    queryString <- ListToQuery(list(link = pagesOriginalCopy$link[i]))
+    articles <- articlesCollection$find(queryString)   
+    words <- c(words, articles$page[[1]]$stemedPlaintext)
+  }
+  putinMentioned <- sum(str_count(words, "путин"))
+  trumpMentioned <- sum(str_count(words, "трамп"))
+  
   # Generate Infographic in PNG Format
   #logoPath <- 'tt.png'
   png(logoPath, width = 10, height = 1.5, units = "in", res = 500)
   grid.newpage()
   grid.rect(gp = gpar(fill = "white", col = "white")) #E2E2E3
+  grid.text("LAST 24 HOURS", vjust = 0, y = unit(0.89, "npc"), gp = gpar(fontfamily = "Anton", col = "#552683", cex = 0.8))
+  grid.text("2014-2018", vjust = 0, y = unit(0.00, "npc"), gp = gpar(fontfamily = "Anton", col = "#552683", cex = 0.8))
   grid.text(paste(
     "Most shared article:",
     "Most commented article:",
     "Articles published: ",
     "Putin mentioned (times):",
     "Trump mentioned (times):",
-    "Number of articles", sep = "\n"), vjust = 0, hjust = 0, x = unit(0.01, "npc"), y = unit(0.11, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
+    "", sep = "\n"), vjust = 0, hjust = 0, x = unit(0.01, "npc"), y = unit(0.11, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
   grid.text(paste(
-    "http://www.lenta.ru",
-    "Ildar Gabdrakhmanov",
-    "Daily",
-    Sys.time(),
-    "2014-2018",
-    numberOfArticles, sep = "\n"), vjust = 0, hjust = 0, x = unit(0.20, "npc"), y = unit(0.11, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
+    topCommentedArticle,
+    topSharedArticle,
+    numberOfArticles,
+    putinMentioned,
+    trumpMentioned,
+    "", sep = "\n"), vjust = 0, hjust = 0, x = unit(0.20, "npc"), y = unit(0.11, "npc"), gp = gpar(fontfamily = "Impact", col = "#552683", cex = 0.8))
   dev.off()
 }
 
