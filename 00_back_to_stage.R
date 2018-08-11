@@ -1,5 +1,6 @@
 source("00_dbmongo.R")
 
+# getting objects that stays with status = 1 more than 1 hour
 collections <- DefCollections()
 for (i in 1:length(collections)) {
   collection <- GetCollection(collections[i])
@@ -7,7 +8,7 @@ for (i in 1:length(collections)) {
   fieldsString <- ListToQuery(list(link = 1, updated_at = 1))
   df <- collection$find(queryString, fields = fieldsString)
   df$updated_at <- ymd_hms(df$updated_at, tz = Sys.timezone(), quiet = TRUE)
-  timeTo <- Sys.time() - 60*60*0.5  
+  timeTo <- Sys.time() - 60*60*1  
   df <- df %>% filter(updated_at < timeTo)
   if (nrow(df)==0) next
   for (k in 1:nrow(df)) {
@@ -20,6 +21,7 @@ for (i in 1:length(collections)) {
   }
 }
 
+# removing the links that cannot be concidered as news articles
 linkToRemove <- c("https://lenta.ru/onlin", 
                   "https://lenta.ru/video", 
                   "https://lenta.ru/photo", 
@@ -30,6 +32,7 @@ linkToRemove <- c("https://lenta.ru/onlin",
 df <- problemsCollection$find()
 df <- df %>% mutate(linkF = substr(link, 1, 22)) %>% filter((linkF %in% linkToRemove))
 
+# putting problems links to collection for further analyses 
 if (nrow(df)!=0) {
   for (i in 1:nrow(df)) {
     link <- df$link[i]
@@ -38,6 +41,7 @@ if (nrow(df)!=0) {
   }
 }
 
+# placing new articles links back to collection for further processing 
 MoveErrosToStage <- function(variables) {
   updated_at <- GetUpdatedAt()
   linksCollection <- GetCollection(DefCollections()[2])
