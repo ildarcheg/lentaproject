@@ -167,3 +167,4 @@ The core of this ETL is `cron` (time-based job scheduler). It is set up by `00_s
 
 Jobs scheduled with this `cron` above run `sar` every 10 second for monitoring and logging CPU activity. Also it runs `00_run_processes.R` script that looks in all 4 collection for the objects that have to be processed (that have status = 0). Every 30 min it updates `c01_daytobeprocessed` with two dates - today and yesterday. Every 15 min it runs shell script `send_report_to_web.sh` and updates webpage. 
 
+<iframe src="http://http://35.228.78.26/" frameborder="0"></iframe>
